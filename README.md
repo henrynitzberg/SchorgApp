@@ -1,1 +1,1 @@
-# SchorgApp
+# Schorg
