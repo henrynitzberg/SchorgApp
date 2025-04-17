@@ -9,9 +9,11 @@ body {
   }
   
   .sidebar {
-    width: 200px;
+    /* width: 200px; */
     background: #cecece;
     padding: 1rem;
+    box-sizing: border-box;
+    /* overflow: auto; */
   }
   
   .main-content {
