@@ -1,0 +1,31 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+  }
+  
+  .layout {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .sidebar {
+    width: 200px;
+    background: #cecece;
+    padding: 1rem;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 2rem;
+  }
+  
+  .resizer {
+    background-color: #ccc;
+    cursor: col-resize;
+    width: 5px;
+  }
+  
+  .main-content {
+    background-color: #fff;
+    overflow: auto;
+  }
