@@ -1,0 +1,30 @@
+.gage-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    height: 100vh;
+    padding: 1em;
+}
+
+.sidebar {
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.main-content {
+    flex: 1;
+    padding: 1rem;
+    overflow: auto;
+}
+
+.resizer {
+    background-color: #ccc;
+    cursor: col-resize;
+    width: 5px;
+}
+
+.hero-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}

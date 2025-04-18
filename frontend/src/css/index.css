@@ -1,33 +1,65 @@
+:root {
+  --gray: #141414;
+  --dark-gray: #1f1f1f;
+  --green: #6FFF96;
+  --dark-green: #39834d;
+  --red: #FF7070;
+  --gray: #292929;
+  --text-gray: #A0A0A0;
+  --yellow: #E3FF71;
+  --blue: #70AAFF;
+  --gray-filter: brightness(0) saturate(100%) invert(11%) sepia(21%) saturate(13%) hue-rotate(46deg) brightness(98%) contrast(88%);
+}
+
 body {
-    margin: 0;
-    font-family: sans-serif;
-  }
-  
-  .layout {
-    display: flex;
-    height: 100vh;
-  }
-  
-  .sidebar {
-    /* width: 200px; */
-    background: #cecece;
-    padding: 1rem;
-    box-sizing: border-box;
-    /* overflow: auto; */
-  }
-  
-  .main-content {
-    flex: 1;
-    padding: 2rem;
-  }
-  
-  .resizer {
-    background-color: #ccc;
-    cursor: col-resize;
-    width: 5px;
-  }
-  
-  .main-content {
-    background-color: #fff;
-    overflow: auto;
-  }
+  margin: 0;
+  font-family: sans-serif;
+  background-color: var(--gray);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+p,
+input,
+button,
+label,
+a,
+div,
+textarea,
+p {
+    font-family: "Quicksand";
+    color: white;
+}
