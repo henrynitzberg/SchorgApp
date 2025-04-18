@@ -1,0 +1,58 @@
+.calendar-week-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.calendar-times-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding-top: 2em;
+}
+
+.calendar-body-wrapper {
+    width: 100%;
+    padding: 0 1em;
+}
+
+.calendar-week-header {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+.day-header-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.weekday {
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+.number-date {
+    font-size: 20px;
+}
+
+.time-slot {
+    font-weight: 300;
+    font-size: 12px;
+}
+
+.calendar-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.grid-lines {
+    border: 1px solid white;
+    width: 5em;
+    height: 2.5em;
+}
