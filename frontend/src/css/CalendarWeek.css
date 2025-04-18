@@ -1,34 +1,34 @@
 .calendar-week-wrapper {
     display: flex;
-    flex-direction: row;
-    width: 100%;
-}
-
-.calendar-times-wrapper {
-    display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    padding-top: 2em;
+    width: 100%;
+    border-radius: 1em;
+    background-color: aquamarine;
+    padding: .5em;
+    overflow: hidden;
 }
 
-.calendar-body-wrapper {
+.calendar-week-header-wrapper {
+    display: flex;
     width: 100%;
-    padding: 0 1em;
+    height: 4em;
+    padding: .25em;
+    border-radius: 1em;
+    background-color: #1f1f1f;
 }
 
 .calendar-week-header {
     display: flex;
     flex-direction: row;
-    gap: 1em;
-    width: 100%;
     justify-content: space-evenly;
+    width: 100%;
+    align-items: center;
 }
 
 .day-header-wrapper {
+    justify-content: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 .weekday {
@@ -41,18 +41,20 @@
     font-size: 20px;
 }
 
-.time-slot {
-    font-weight: 300;
-    font-size: 12px;
+.calendar-week-body {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
 }
 
-.calendar-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+.calendar-week-hour-wrapper {
+    display: flex;
+    align-items: center;
 }
 
-.grid-lines {
-    border: 1px solid white;
-    width: 5em;
-    height: 2.5em;
+.calendar-week-hour {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }

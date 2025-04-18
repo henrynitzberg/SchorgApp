@@ -23,31 +23,34 @@ const spaces = [
   "Clibbing",
 ];
 
-for (const todo in upcomingTodos) {
-  console.log(upcomingTodos[todo]);
-}
+const maxTodosDisplayed = 6;
 
 export default function Sidebar() {
   return (
     <div className="sidebar-wrapper">
       <div className="sidebar-top">
-        <div className="sidebar-top-top">
-          {upcomingTodos.map((todo, i) => (
+        <div className="sidebar-top-widget">
+          {upcomingTodos.slice(0, maxTodosDisplayed).map((todo, i) => (
             <div key={i} className="upcoming-todo-wrapper">
               <div className="dot"></div>
               <p className="upcoming-todo">{todo}</p>
             </div>
           ))}
+          {upcomingTodos.length > maxTodosDisplayed && (
+            <div className="sidebar-overflow-text">see more tasks</div>
+          )}
         </div>
-        <h1 className="sidebar-top-header">Todo</h1>
+        <h1 className="sidebar-top-title">Todo</h1>
       </div>
       <div className="sidebar-bottom">
-        <h1 className="sidebar-bottom-header">Your Spaces</h1>
-        {spaces.map((space, i) => (
-          <div key={i} className="space-wrapper">
-            <p className="space">{space}</p>
-          </div>
-        ))}
+        <div className="sidebar-bottom-widget">
+          {spaces.map((space, i) => (
+            <div key={i} className="space-wrapper">
+              <p className="space">{space}</p>
+            </div>
+          ))}
+        </div>
+        <h1 className="sidebar-bottom-title">Your Spaces</h1>
       </div>
     </div>
   );

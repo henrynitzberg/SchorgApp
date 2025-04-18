@@ -11,48 +11,23 @@ export default function CalendarWeek({ startDate = new Date() }) {
 
   return (
     <div className="calendar-week-wrapper">
-      <div className="calendar-times-wrapper">
-        {hours.map((hour) => (
-          <p key={hour} className="time-slot">
-            {format(new Date().setHours(hour, 0), "HH:mm")}
-          </p>
-        ))}
-      </div>
-      <div className="calendar-body-wrapper">
+      <div className ="calendar-week-header-wrapper">
         <div className="calendar-week-header">
-          {/* <div className="time-column" /> */}
           {days.map((day) => (
             <div key={day} className="day-header-wrapper">
-              <h1 className="weekday">{format(day, "EEE")}</h1>
               <h1 className="number-date">{format(day, "dd")}</h1>
+              <h1 className="weekday">{format(day, "EEE")}</h1>
             </div>
           ))}
-        </div>
-        <div className="calendar-body">
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
-          <div className="grid-lines"></div>
+          </div>
+      </div>
+      <div className="calendar-week-body">
+        <div className="calendar-week-hours">
+        {hours.map((hour) => (
+          <div key={hour} className="calendar-week-hour-wrapper">
+            <div className="calendar-week-hour">{`${hour}:00`}</div>
+          </div>
+        ))}
         </div>
       </div>
     </div>
