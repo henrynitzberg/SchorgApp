@@ -1,91 +1,26 @@
-import React, { useEffect, useRef } from 'react';
-import { startOfWeek, addDays, format } from 'date-fns';
+import { useEffect, useRef, useState } from "react";
+import { startOfWeek, addDays, format } from "date-fns";
+import axios from "axios";
 
-import '../css/CalendarWeek.css';
+import "../css/CalendarWeek.css";
 
 const hours = Array.from({ length: 24 }, (_, i) => i); // 0 to 23
 const hourHeight = 4; // 4em
 const pixelsPerHour = hourHeight * 16; // 1em = 16px
 
-const sampleTodos = [
-  {
-    id: 1,
-    title: 'figure out time to meet with Henry',
-    start: new Date('2025-04-20T09:30:00'),
-    end: new Date('2025-04-20T10:15:00'),
-    description: 'Note: do NOT poop my pants this time',
-  },
-];
-
-const sampleDeliverables = [
-  {
-    id: 1,
-    title: 'big important project',
-    due_date: new Date('2025-04-24T23:59:00'),
-    description: 'my life depends on this',
-  },
-  {
-    id: 2,
-    title: 'big important project2',
-    due_date: new Date('2025-04-24T23:59:00'),
-    description: 'my life depends on this2',
-  },
-  {
-    id: 3,
-    title: 'big important project2',
-    due_date: new Date('2025-04-24T23:59:00'),
-    description: 'my life depends on this2',
-  },
-  {
-    id: 4,
-    title: 'big important project2',
-    due_date: new Date('2025-04-24T23:59:00'),
-    description: 'my life depends on this2',
-  },
-  {
-    id: 3,
-    title: 'big important project2',
-    due_date: new Date('2025-04-22T23:59:00'),
-    description: 'my life depends on this2',
-  },
-  {
-    id: 4,
-    title: 'big important project2',
-    due_date: new Date('2025-04-22T23:59:00'),
-    description: 'my life depends on this2',
-  },
-  {
-    id: 4,
-    title: 'big important project2',
-    due_date: new Date('2025-04-23T23:59:00'),
-    description: 'my life depends on this2',
-  },
-  {
-    id: 4,
-    title: 'big important project2',
-    due_date: new Date('2025-04-25T23:59:00'),
-    description: 'my life depends on this2',
-  },
-  {
-    id: 4,
-    title: 'big important project2',
-    due_date: new Date('2025-04-25T23:59:00'),
-    description: 'my life depends on this2',
-  },
-  {
-    id: 4,
-    title: 'big important project2',
-    due_date: new Date('2025-04-25T23:59:00'),
-    description: 'my life depends on this2',
-  },
-];
+const APP_URL = "http://localhost:8000";
 
 export default function CalendarWeek({ startDate = new Date() }) {
+  const [userTodos, setUserTodos] = useState([]);
+  const [userDeliverables, setUserDeliverables] = useState([]);
+
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   const scrollRef = useRef(null);
+  const email = "henry.nitzberg@nitzberg.henry";
 
+  // starts at 7:45 am
   useEffect(() => {
     const targetHour = 7.75;
     const scrollOffset = pixelsPerHour * targetHour;
@@ -95,41 +30,67 @@ export default function CalendarWeek({ startDate = new Date() }) {
     }
   }, []);
 
+  // loads user data
+  useEffect(() => {
+    async function loadUserData() {
+      try {
+        const userInfo = await axios.post(APP_URL + "/get-user", {
+          email: email,
+        });
+        setUserTodos(userInfo.data.todos);
+        setUserDeliverables(userInfo.data.user_deliverables);
+        console.log(userInfo);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadUserData();
+  }, []);
+
   return (
     <div className="calendar-week-wrapper">
       <div className="calendar-week-headers-wrapper">
-        {days.map((day) => {
-          const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+        {days.map((day, i) => {
+          const isToday =
+            format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
           return (
-            <div className={isToday ? 'calendar-week-today-header' : 'calendar-week-day-header'}>
-              <h1 className="number-date">{format(day, 'MM/dd')}</h1>
-              <h1 className="weekday">{format(day, 'EEE')}</h1>
+            <div
+              className={
+                isToday
+                  ? "calendar-week-today-header"
+                  : "calendar-week-day-header"
+              }
+              key={i}
+            >
+              <h1 className="number-date">{format(day, "MM/dd")}</h1>
+              <h1 className="weekday">{format(day, "EEE")}</h1>
               <div className="dots-wrapper">
                 {/* add deadlines */}
-                {sampleDeliverables
-                      .filter(
-                        (event) =>
-                          format(event.due_date, 'yyyy-MM-dd') ===
-                          format(day, 'yyyy-MM-dd')
-                      ).slice(0, 4)
+                {userDeliverables
+                  .filter(
+                    (event) =>
+                      format(event.due_date, "yyyy-MM-dd") ===
+                      format(day, "yyyy-MM-dd")
+                  )
+                  .slice(0, 4)
                   .map((event, index) => {
                     return (
-                      index < 3 && (
-                        <div key={event.id} className="dot"></div>
-                        ) || (
-                      index === 3 && (
-                        <div className="header-ellipses">...</div>
-                      )
-                    ))
-                })}
+                      (index < 3 && <div key={index} className="dot"></div>) ||
+                      (index === 3 && (
+                        <div key={index} className="header-ellipses">
+                          ...
+                        </div>
+                      ))
+                    );
+                  })}
               </div>
             </div>
-          )
+          );
         })}
       </div>
       <div className="calendar-week-day-bodys-wrapper" ref={scrollRef}>
         {days.map((day, index) => (
-          <div className="calendar-week-day-body">
+          <div key={index} className="calendar-week-day-body">
             {hours.map((hour) => (
               <div
                 key={hour}
@@ -143,32 +104,47 @@ export default function CalendarWeek({ startDate = new Date() }) {
             ))}
 
             {/* add current time line marker */}
-            {format(day, 'yyyy-MM-dd') == format(new Date(), 'yyyy-MM-dd') && (
+            {format(day, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") && (
               <div
                 className="current-time-line"
                 style={{
-                  top: `${pixelsPerHour * (new Date().getHours() + (new Date().getMinutes() / 60))}px`,
+                  top: `${
+                    pixelsPerHour *
+                    (new Date().getHours() + new Date().getMinutes() / 60)
+                  }px`,
                 }}
               ></div>
             )}
 
             {/* add events */}
-            {sampleTodos
+            {userTodos
               .filter(
                 (event) =>
-                  format(event.start, 'yyyy-MM-dd') ===
-                  format(day, 'yyyy-MM-dd')
+                  format(event.start_time, "yyyy-MM-dd") ===
+                  format(day, "yyyy-MM-dd")
               )
-              .map((event) => {
+              .map((event, index) => {
                 const startHour =
-                  event.start.getHours() + event.start.getMinutes() / 60;
+                  new Date(event.start_time).getHours() +
+                  new Date(event.start_time).getMinutes() / 60;
                 const endHour =
-                  event.end.getHours() + event.end.getMinutes() / 60;
+                  new Date(event.end_time).getHours() +
+                  new Date(event.end_time).getMinutes() / 60;
                 const top = startHour * pixelsPerHour;
                 const height = (endHour - startHour) * pixelsPerHour;
+                console.log(startHour, endHour);
+                console.log(
+                  new Date(event.start_time).getHours(),
+                  new Date(event.end_time).getHours(),
+                  new Date(event.start_time).getMinutes() / 60,
+                  new Date(event.end_time).getMinutes() / 60
+                );
+
+                console.log(event.start_time);
+                console.log(new Date());
                 return (
                   <div
-                    key={event.id}
+                    key={index}
                     className="calendar-event"
                     style={{
                       top: `${top}px`,
@@ -177,8 +153,8 @@ export default function CalendarWeek({ startDate = new Date() }) {
                   >
                     <h1 className="calendar-event-title"> {event.title} </h1>
                     <h1 className="calendar-event-time">
-                      {format(event.start, 'hh:mm')}-
-                      {format(event.end, 'hh:mm')}
+                      {format(event.start_time, "hh:mm")}-
+                      {format(event.end_time, "hh:mm")}
                     </h1>
                   </div>
                 );
