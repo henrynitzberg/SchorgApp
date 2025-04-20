@@ -1,4 +1,13 @@
 :root {
+  /* henrys palette choice */
+  --back1: #040605;
+  --back2: #171611;
+  --back3: #2b2d2a;
+  --back4: #4d453a;
+  --back5: #74624b;
+  --back6: #9b8f7a;
+  --lighter-gray: #dcdcdc;
+  /* end henrys palette choice */
   --gray: #141414;
   --dark-gray: #1f1f1f;
   --green: #6FFF96;
@@ -6,6 +15,7 @@
   --red: #FF7070;
   --gray: #292929;
   --text-gray: #A0A0A0;
+  --light-gray: #A0A0A0;
   --yellow: #E3FF71;
   --blue: #70AAFF;
   --gray-filter: brightness(0) saturate(100%) invert(11%) sepia(21%) saturate(13%) hue-rotate(46deg) brightness(98%) contrast(88%);
