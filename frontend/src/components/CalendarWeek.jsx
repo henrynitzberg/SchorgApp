@@ -28,9 +28,9 @@ export default function CalendarWeek({
 
   const scrollRef = useRef(null);
 
-  // starts at 7:45 am
+  // view calendar starting 4 hours before right now
   useEffect(() => {
-    const targetHour = 7.75;
+    const targetHour = (new Date()).getHours() + (new Date().getMinutes() / 60) - 4;
     const scrollOffset = pixelsPerHour * targetHour;
 
     if (scrollRef.current) {
@@ -41,6 +41,7 @@ export default function CalendarWeek({
   return (
     <div className="calendar-week-wrapper">
       <div className="calendar-week-headers-wrapper">
+        <div className="gap-for-hours"> </div>
         {days.map((day, i) => {
           const isToday =
             format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
@@ -80,6 +81,11 @@ export default function CalendarWeek({
         })}
       </div>
       <div className="calendar-week-day-bodys-wrapper" ref={scrollRef}>
+        <div className="calendar-week-hours-wrapper">
+          {hours.map((hour) => (
+                <h1 className="calendar-week-hour-label" style={{ height: `${pixelsPerHour}px` }}> {hour}:00 </h1>
+          ))}
+        </div>
         {days.map((day, index) => (
           <div key={index} className="calendar-week-day-body">
             {hours.map((hour) => (
@@ -88,9 +94,6 @@ export default function CalendarWeek({
                 className="calendar-week-hour"
                 style={{ height: `${pixelsPerHour}px` }}
               >
-                {index === 0 && (
-                  <h1 className="calendar-week-hour-label"> {hour}:00 </h1>
-                )}
               </div>
             ))}
 
