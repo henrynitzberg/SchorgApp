@@ -17,8 +17,11 @@ export default function CalendarWeek({
 
   useEffect(() => {
     setUserTodos(todos);
+  }, [todos]);
+
+  useEffect(() => {
     setUserDeliverables(deliverables);
-  }, [todos, deliverables]);
+  }, [deliverables]);
 
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -127,9 +130,6 @@ export default function CalendarWeek({
                   new Date(event.start_time).getMinutes() / 60,
                   new Date(event.end_time).getMinutes() / 60
                 );
-
-                console.log(event.start_time);
-                console.log(new Date());
                 return (
                   <div
                     key={index}

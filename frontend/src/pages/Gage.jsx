@@ -11,6 +11,7 @@ const APP_URL = "http://localhost:8000";
 export default function Gage() {
   const [userTodos, setUserTodos] = useState([]);
   const [userDeliverables, setUserDeliverables] = useState([]);
+  const [userSpaces, setUserSpaces] = useState([]);
 
   const email = "henry.nitzberg@nitzberg.henry";
 
@@ -23,9 +24,9 @@ export default function Gage() {
         });
         setUserTodos(userInfo.data.todos);
         setUserDeliverables(userInfo.data.user_deliverables);
-        console.log(userInfo);
+        setUserSpaces(userInfo.data.user_spaces);
+        console.log(userInfo.data.user_spaces);
       } catch (err) {
-        console.log("bad user data");
         console.error(err);
       }
     }
@@ -34,7 +35,12 @@ export default function Gage() {
 
   return (
     <div className="gage-wrapper">
-      <Sidebar />
+      {console.log(userSpaces)}
+      <Sidebar
+        todos={userTodos}
+        deliverables={userDeliverables}
+        spaces={userSpaces}
+      />
       <div className="hero-wrapper">
         <CalendarWeek todos={userTodos} deliverables={userDeliverables} />
       </div>
