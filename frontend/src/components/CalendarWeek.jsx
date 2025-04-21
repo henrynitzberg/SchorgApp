@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format } from "date-fns";
-import axios from "axios";
 
 import "../css/CalendarWeek.css";
 
@@ -8,17 +7,23 @@ const hours = Array.from({ length: 24 }, (_, i) => i); // 0 to 23
 const hourHeight = 4; // 4em
 const pixelsPerHour = hourHeight * 16; // 1em = 16px
 
-const APP_URL = "http://localhost:8000";
-
-export default function CalendarWeek({ startDate = new Date() }) {
+export default function CalendarWeek({
+  startDate = new Date(),
+  todos,
+  deliverables,
+}) {
   const [userTodos, setUserTodos] = useState([]);
   const [userDeliverables, setUserDeliverables] = useState([]);
+
+  useEffect(() => {
+    setUserTodos(todos);
+    setUserDeliverables(deliverables);
+  }, [todos, deliverables]);
 
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   const scrollRef = useRef(null);
-  const email = "henry.nitzberg@nitzberg.henry";
 
   // starts at 7:45 am
   useEffect(() => {
@@ -28,23 +33,6 @@ export default function CalendarWeek({ startDate = new Date() }) {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollOffset;
     }
-  }, []);
-
-  // loads user data
-  useEffect(() => {
-    async function loadUserData() {
-      try {
-        const userInfo = await axios.post(APP_URL + "/get-user", {
-          email: email,
-        });
-        setUserTodos(userInfo.data.todos);
-        setUserDeliverables(userInfo.data.user_deliverables);
-        console.log(userInfo);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    loadUserData();
   }, []);
 
   return (

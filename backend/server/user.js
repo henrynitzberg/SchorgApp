@@ -25,7 +25,7 @@ async function testConnection() {
         return err;
     }
     finally {
-        await client.close();
+        // await client.close();
     }
 }
 
@@ -46,7 +46,7 @@ async function getUser(email) {
         throw err;
     }
     finally {
-        await client.close();
+        // await client.close();
     }
 }
 
