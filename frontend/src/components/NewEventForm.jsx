@@ -3,9 +3,10 @@ import "../css/NewEventForm.css";
 
 export default function NewEventForm({
   position,
+  initialStartTime,
+  initialEndTime,
   onClose,
   onSave,
-  initialTime,
   editMode,
 }) {
   const popupRef = useRef(null);
@@ -33,7 +34,6 @@ export default function NewEventForm({
 
   const [titleErrorMessage, setTitleErrorMessage] = useState("");
   const [timeErrorMessage, setTimeErrorMessage] = useState("");
-  const [error, setError] = useState(false);
 
   const clearErrorAfterDelay = () => {
     setTimeout(() => {
@@ -69,10 +69,10 @@ export default function NewEventForm({
           const form = e.target;
 
           const title = form.title.value;
-          if (!title) {
+          if (!title || title.length === 0) {
             setTitleErrorMessage("Please enter a title.");
             clearErrorAfterDelay();
-            setError(true);
+            return;
           }
 
           const description = form.description.value;
@@ -82,21 +82,22 @@ export default function NewEventForm({
           if (!startTime || !endTime) {
             setTimeErrorMessage("Please enter a start and end time.");
             clearErrorAfterDelay();
-            setError(true);
-          }
-          
-          // convert to dates
-          // if (startTime > endTime) {
-          //   setTimeErrorMessage("Start time must be before end time.");
-          //   clearErrorAfterDelay();
-          //   setError(true);
-          // }
-
-          if (error) {
             return;
           }
 
-          // onSave({ title, description, startTime, endTime });
+          const startHour = parseInt(startTime.split(":")[0]);
+          const startMinute = parseInt(startTime.split(":")[1]);
+          const endHour = parseInt(endTime.split(":")[0]);
+          const endMinute = parseInt(endTime.split(":")[1]);
+
+          // Check if start time is before end time
+          if (startHour > endHour || startHour === endHour && startMinute >= endMinute) {
+            setTimeErrorMessage("Start time must be before end time.");
+            clearErrorAfterDelay();
+            return;
+          }
+          
+          onSave({ title, description, startTime, endTime });
           onClose();
         }}
       >
@@ -128,6 +129,7 @@ export default function NewEventForm({
               name="startTime"
               type="text"
               placeholder="start"
+              defaultValue={initialStartTime}
               className="time-input"
             />
           </div>
@@ -137,24 +139,18 @@ export default function NewEventForm({
               name="endTime"
               type="text"
               placeholder="end"
+              defaultValue={initialEndTime}
               className="time-input"
             />
           </div>
         </div>
         {timeErrorMessage && <div className="error">{timeErrorMessage}</div>}
-        {/* <div style={{ marginTop: "0.5em" }}>
-          <button type="submit">Save</button>
-          <button
-            type="button"
-            onClick={onClose}
-            // style={{ marginLeft: "0.5em" }}
-          >
-            Cancel
-          </button>
-        </div> */}
-        <div className="event-popup-bottom-buttons">
-          <button className="event-popup-submit" type="submit">
+        <div className="event-popup-bottom-buttons-wrapper">
+          <button className="event-popup-button" type="submit">
             submit
+          </button>
+          <button className="event-popup-button" onClick={onClose}>
+            cancel
           </button>
         </div>
       </form>

@@ -22,12 +22,11 @@ export default function CalendarWeek({
   const [eventPopupPosition, setEventPopupPosition] = useState({ x: 0, y: 0 });
 
   const [selectedDay, setSelectedDay] = useState(null); // For assigning event to day
-  const [initialTime, setInitialTime] = useState("00:00"); // optional
-  const [initialDuration, setInitialDuration] = useState(1); // in hours (to be used later)
+  const [initialStartTime, setInitialStartTime] = useState("00:00"); // optional
+  const initialDuration = 1; // in hours
+  const [initialEndTime, setInitialEndTime] = useState("00:00"); // optional
   
   const handleSaveNewEvent = (newEventData) => {
-    console.log("Saving:", newEventData);
-  
     // Convert to full datetime using selectedDay
     const [startHour, startMinute] = newEventData.startTime.split(":");
     const [endHour, endMinute] = newEventData.endTime.split(":");
@@ -145,22 +144,32 @@ export default function CalendarWeek({
 
               const clickedHour = y / pixelsPerHour;
               const hour = Math.floor(clickedHour);
-              const minutes = Math.floor((clickedHour - hour) * 60);
-              const formattedTime = `${hour.toString().padStart(2, "0")}:${minutes
+              // floor to nearest 15 minutes
+              const minutes = Math.floor(Math.floor((clickedHour - hour) * 60) / 15) * 15;
+              const formattedStartTime = `${hour.toString().padStart(2, "0")}:${minutes
                 .toString()
                 .padStart(2, "0")}`;
-              setInitialTime(formattedTime);
+              setInitialStartTime(formattedStartTime);
+              if (24 - clickedHour < initialDuration) {
+                setInitialEndTime("23:59");
+              } else {
+                const formattedEndTime = `${(hour + initialDuration).toString().padStart(2, "0")}:${minutes
+                  .toString()
+                  .padStart(2, "0")}`;
+                setInitialEndTime(formattedEndTime);
+              }
               setSelectedDay(day);
             }}
           >
             {showEventPopup && eventPopupDay == index && (
               <NewEventForm
                 position={eventPopupPosition}
-                initialTime={initialTime}
+                initialStartTime={initialStartTime}
+                initialEndTime={initialEndTime}
                 onClose={() => {
-                  setShowEventPopup(false);
-                  setclickedOutOfPopupPopup(true);
-                }}
+                    setShowEventPopup(false);
+                    setclickedOutOfPopupPopup(true);
+                  }}
                 onSave={handleSaveNewEvent}
                 editMode={false}
               />
