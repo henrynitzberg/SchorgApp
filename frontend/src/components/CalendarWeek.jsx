@@ -162,6 +162,7 @@ export default function CalendarWeek({
                   setclickedOutOfPopupPopup(true);
                 }}
                 onSave={handleSaveNewEvent}
+                editMode={false}
               />
             )}
 

@@ -1,0 +1,111 @@
+.event-popup-form {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+
+    width: 200px;
+    /* gap: 0.75em; */
+    /* bottom: -3em;
+    right: -10em; */
+    background-color: var(--back3);
+    color: black;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    padding-left: 1em;
+    padding-right: 1em;
+    border: 1px solid var(--gray);
+    border-radius: 0.5em;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    z-index: 100;
+}
+
+.event-popup-X-button-wrapper {
+    position: absolute;
+    top: 0.25em;
+    right: 0.25em;
+    /* padding-left: 0.5em;
+    padding-right: 0.5em; */
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: .5em;
+    background-color: var(--black);
+    text-align: center;
+    align-items: center;
+    color: var(--text-gray);
+    /* font-size: 1.2em; */
+    
+    border: 1px solid var(--text-gray);
+    cursor: pointer;
+}
+
+.event-popup-title {
+    font-size: 1.2em;
+    font-weight: 500;
+    color: var(--lighter-gray);
+    /* border: 1px solid var(--text-gray); */
+    text-align: center;
+    margin-bottom: .5em;
+}
+
+.title-input {
+    width: 100%;
+    background-color: var(--dark-gray);
+    border: none;
+    padding: 0.25em 0.5em;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid var(--gray);
+    /* margin-bottom: .25em; */
+    border-radius: .25em;
+}
+
+.description-input {
+    width: 100%;
+    background-color: var(--dark-gray);
+    border: none;
+    padding: 0.25em 0.5em;
+    font-size: 14px;
+    /* color: var(--back5); */
+    border: 1px solid var(--gray);
+    margin-top: .25em;
+    margin-bottom: .4em;
+    border-radius: .25em;
+    resize: none;
+}
+
+.event-popup-duration-title {
+    color: var(--lighter-gray);
+    font-size: 1em;
+    font-weight: 500;
+    margin-left: .1em;
+    margin-bottom: .1em;
+}
+
+.event-popup-duration-wrapper {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    width: 100%;
+    gap: 0.25em;
+    margin-bottom: .5em;
+}
+
+.time-input {
+    width: 100%;
+    background-color: var(--dark-gray);
+    border: none;
+    padding: 0.25em 0.5em;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid var(--gray);
+    margin-bottom: .25em;
+    border-radius: .25em;
+}
+
+.error {
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 400;
+    /* margin-top: .25em; */
+    text-align: center;
+}
