@@ -96,7 +96,18 @@ export default function NewEventForm({
             clearErrorAfterDelay();
             return;
           }
-          
+
+          if (startHour < 0 || startHour > 23 || startMinute < 0 || startMinute > 59) {
+            setTimeErrorMessage("Please enter a valid start time.");
+            clearErrorAfterDelay();
+            return;
+          }
+          if (endHour < 0 || endHour > 23 || endMinute < 0 || endMinute > 59) {
+            setTimeErrorMessage("Please enter a valid end time.");
+            clearErrorAfterDelay();
+            return;
+          }
+
           onSave({ title, description, startTime, endTime });
           onClose();
         }}
