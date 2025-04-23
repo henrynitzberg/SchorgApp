@@ -1,4 +1,4 @@
-.event-popup-form {
+.todo-popup-form {
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -16,12 +16,10 @@
     z-index: 100;
 }
 
-.event-popup-X-button-wrapper {
+.todo-popup-X-button-wrapper {
     position: absolute;
     top: 0.25em;
     right: 0.25em;
-    /* padding-left: 0.5em;
-    padding-right: 0.5em; */
     width: 1.5em;
     height: 1.5em;
     border-radius: .5em;
@@ -29,17 +27,15 @@
     text-align: center;
     align-items: center;
     color: var(--text-gray);
-    /* font-size: 1.2em; */
     
     border: 1px solid var(--text-gray);
     cursor: pointer;
 }
 
-.event-popup-title {
+.todo-popup-title {
     font-size: 1.2em;
     font-weight: 500;
     color: var(--lighter-gray);
-    /* border: 1px solid var(--text-gray); */
     text-align: center;
     margin-bottom: .5em;
 }
@@ -68,7 +64,7 @@
     resize: none;
 }
 
-.event-popup-subtitle {
+.todo-popup-subtitle {
     color: var(--lighter-gray);
     font-size: 1em;
     font-weight: 500;
@@ -76,7 +72,7 @@
     margin-bottom: .1em;
 }
 
-.event-popup-duration-wrapper {
+.todo-popup-duration-wrapper {
     display: flex;
     flex-direction: row;
     text-align: center;
@@ -93,15 +89,17 @@
     font-size: 14px;
     text-align: center;
     border: 1px solid var(--gray);
-    /* margin-bottom: .25em; */
     border-radius: .25em;
+}
+
+.todo-popup-dash {
+    color: var(--lighter-gray);
 }
 
 .error {
     color: var(--red);
     font-size: 12px;
     font-weight: 400;
-    /* margin-top: .25em; */
     text-align: center;
 }
 
@@ -120,7 +118,7 @@
     margin-bottom: .25em;
 }
 
-.event-popup-bottom-buttons-wrapper {
+.todo-popup-bottom-buttons-wrapper {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -128,7 +126,7 @@
     margin-top: .5em;
 }
 
-.event-popup-button {
+.todo-popup-button {
     top: 0.25em;
     right: 0.25em;
     padding: 0.25em;

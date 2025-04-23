@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import "../css/NewTodoForm.css";
+import "../css/NewToDoForm.css";
 
-export default function NewTodoForm({
+export default function NewToDoForm({
   position,
   initialStartTime,
   initialEndTime,
@@ -48,7 +48,7 @@ export default function NewTodoForm({
   return (
     <div
       ref={popupRef}
-      className="event-popup-form"
+      className="todo-popup-form"
       style={{
         top: position.y,
         left: position.x,
@@ -56,7 +56,7 @@ export default function NewTodoForm({
     >
       {/* Close "X" button */}
       <div
-        className="event-popup-X-button-wrapper"
+        className="todo-popup-X-button-wrapper"
         onClick={(e) => {
           e.stopPropagation();
           onClose();
@@ -126,7 +126,7 @@ export default function NewTodoForm({
           onClose();
         }}
       >
-        <div className="event-popup-title"> New ToDo </div>
+        <div className="todo-popup-title"> New ToDo </div>
         <div>
           <input
             name="title"
@@ -148,8 +148,8 @@ export default function NewTodoForm({
           />
         </div>
 
-        <h1 className="event-popup-subtitle">Duration</h1>
-        <div className="event-popup-duration-wrapper">
+        <h1 className="todo-popup-subtitle">Duration</h1>
+        <div className="todo-popup-duration-wrapper">
           <div>
             <input
               name="startTime"
@@ -159,7 +159,7 @@ export default function NewTodoForm({
               className="time-input"
             />
           </div>
-          <h1 className="event-popup-dash">-</h1>
+          <h1 className="todo-popup-dash">-</h1>
           <div>
             <input
               name="endTime"
@@ -172,15 +172,10 @@ export default function NewTodoForm({
         </div>
         {timeErrorMessage && <div className="error">{timeErrorMessage}</div>}
 
-        <h1 className="event-popup-subtitle">Deliverable</h1>
+        <h1 className="todo-popup-subtitle">Deliverable</h1>
         <div>
-          <select
-            name="deliverable"
-            className="deliverable-select"
-          >
-            <option value="">
-              (none)
-            </option>
+          <select name="deliverable" className="deliverable-select">
+            <option value="">(none)</option>
             {deliverables.map((deliverable, i) => (
               <option key={i} value={deliverable.title}>
                 {deliverable.title}
@@ -189,11 +184,11 @@ export default function NewTodoForm({
           </select>
         </div>
 
-        <div className="event-popup-bottom-buttons-wrapper">
-          <button className="event-popup-button" type="submit">
+        <div className="todo-popup-bottom-buttons-wrapper">
+          <button className="todo-popup-button" type="submit">
             submit
           </button>
-          <button className="event-popup-button" onClick={onClose}>
+          <button className="todo-popup-button" onClick={onClose}>
             cancel
           </button>
         </div>

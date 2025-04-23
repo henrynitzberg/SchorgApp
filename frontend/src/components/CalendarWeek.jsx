@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { startOfWeek, addDays, format } from "date-fns";
-import NewTodoForm from "./NewToDoForm";
+import { startOfWeek, addDays, format, set } from "date-fns";
+import NewToDoForm from "./NewToDoForm";
 
 import "../css/CalendarWeek.css";
 import NewDeliverableForm from "./NewDeliverableForm";
@@ -18,17 +18,20 @@ export default function CalendarWeek({
   const [userDeliverables, setUserDeliverables] = useState([]);
 
   // need pop up specific variables...
-  const [showEventPopup, setShowEventPopup] = useState(false);
-  const [clickedOutOfPopup, setclickedOutOfPopupPopup] = useState(false);
+  const [showToDoPopup, setShowToDoPopup] = useState(false);
+  const [showDeliverablePopup, setShowDeliverablePopup] = useState(false);
+  const [clickedOutOfToDoPopup, setClickedOutOfToDoPopup] = useState(false);
+  const [clickedOutOfDeliverablePopup, setClickedOutOfDeliverablePopup] = useState(false);
+  const [toDoPopupPosition, setToDoPopupPosition] = useState({ x: 0, y: 0 });
+  const [deliverablePopupPosition, setDeliverablePopupPosition] = useState({ x: 0, y: 0 });
   const [eventPopupDay, setEventPopupDay] = useState(-1);
-  const [eventPopupPosition, setEventPopupPosition] = useState({ x: 0, y: 0 });
 
   const [selectedDay, setSelectedDay] = useState(null); // For assigning event to day
   const [initialStartTime, setInitialStartTime] = useState("00:00"); // optional
   const initialDuration = 1; // in hours
   const [initialEndTime, setInitialEndTime] = useState("00:00"); // optional
 
-  const handleSaveNewEvent = (newEventData) => {
+  const handleSaveNewToDo = (newEventData) => {
     // Convert to full datetime using selectedDay
     const [startHour, startMinute] = newEventData.startTime.split(":");
     const [endHour, endMinute] = newEventData.endTime.split(":");
@@ -50,6 +53,22 @@ export default function CalendarWeek({
       },
     ]);
   };
+
+  const handleSaveNewDeliverable = (newEventData) => {
+    const [dueMonth, dueDay, dueYear] = newEventData.dueDate.split("/");
+    const [dueHour, dueMinute] = newEventData.dueTime.split(":");
+
+    const due_date = new Date(dueYear, dueMonth - 1, dueDay, dueHour, dueMinute);
+
+    setUserDeliverables((prev) => [
+      ...prev,
+      {
+        title: newEventData.title,
+        description: newEventData.description,
+        due_date,
+      },
+    ]);
+  }
 
   useEffect(() => {
     setUserTodos(todos);
@@ -90,43 +109,31 @@ export default function CalendarWeek({
               }
               key={index}
               onClick={(e) => {
-                if (showEventPopup || clickedOutOfPopup) {
-                  setclickedOutOfPopupPopup(false);
+                if (showDeliverablePopup || clickedOutOfDeliverablePopup) {
+                  setClickedOutOfDeliverablePopup(false);
                   return;
                 }
                 const rect = e.currentTarget.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
                 setEventPopupDay(index);
-                setEventPopupPosition({ x, y });
-                setShowEventPopup(true);
+                setDeliverablePopupPosition({ x, y });
+                setShowDeliverablePopup(true);
                 setSelectedDay(day);
               }}
             >
-              {showEventPopup &&
-                eventPopupDay == index &&
-                (console.log(eventPopupPosition),
-                (
+              {
+                showDeliverablePopup && eventPopupDay == index && (
                   <NewDeliverableForm
-                    position={eventPopupPosition}
+                    position={deliverablePopupPosition}
+                    initialDueDay={day}
+                    onSubmit={handleSaveNewDeliverable}
                     onClose={() => {
-                      setShowEventPopup(false);
-                      setclickedOutOfPopupPopup(true);
+                      setShowDeliverablePopup(false);
+                      setClickedOutOfDeliverablePopup(true);
                     }}
                   />
-                ))
-                // <NewTodoForm
-                //   position={eventPopupPosition}
-                //   initialStartTime={initialStartTime}
-                //   initialEndTime={initialEndTime}
-                //   deliverables={userDeliverables}
-                //   onClose={() => {
-                //       setShowEventPopup(false);
-                //       setclickedOutOfPopupPopup(true);
-                //     }}
-                //   onSave={handleSaveNewEvent}
-                //   editMode={false}
-                // />
+                )
               }
               <h1 className="number-date">{format(day, "MM/dd")}</h1>
               <h1 className="weekday">{format(day, "EEE")}</h1>
@@ -172,16 +179,16 @@ export default function CalendarWeek({
             key={index}
             className="calendar-week-day-body"
             onClick={(e) => {
-              if (showEventPopup || clickedOutOfPopup) {
-                setclickedOutOfPopupPopup(false);
+              if (showToDoPopup || clickedOutOfToDoPopup) {
+                setClickedOutOfToDoPopup(false);
                 return;
               }
               const rect = e.currentTarget.getBoundingClientRect();
               const x = e.clientX - rect.left;
               const y = e.clientY - rect.top;
               setEventPopupDay(index);
-              setEventPopupPosition({ x, y });
-              setShowEventPopup(true);
+              setToDoPopupPosition({ x, y });
+              setShowToDoPopup(true);
 
               const clickedHour = y / pixelsPerHour;
               const hour = Math.floor(clickedHour);
@@ -203,17 +210,17 @@ export default function CalendarWeek({
               setSelectedDay(day);
             }}
           >
-            {showEventPopup && eventPopupDay == index && (
-              <NewTodoForm
-                position={eventPopupPosition}
+            {showToDoPopup && eventPopupDay == index && (
+              <NewToDoForm
+                position={toDoPopupPosition}
                 initialStartTime={initialStartTime}
                 initialEndTime={initialEndTime}
                 deliverables={userDeliverables}
                 onClose={() => {
-                  setShowEventPopup(false);
-                  setclickedOutOfPopupPopup(true);
+                  setShowToDoPopup(false);
+                  setClickedOutOfToDoPopup(true);
                 }}
-                onSave={handleSaveNewEvent}
+                onSave={handleSaveNewToDo}
                 editMode={false}
               />
             )}
