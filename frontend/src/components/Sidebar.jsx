@@ -1,43 +1,31 @@
 import { useState, useEffect } from "react";
 
+import AddSpacePopUp from "./AddSpacePopUp.jsx";
+
 import "../css/Sidebar.css";
-
-// const allTasks = [
-//   "get groceries",
-//   "figure out a time to meet with henry to work on project",
-//   "send email to professor",
-//   "get gas",
-//   "get body wash",
-//   "avocado, apples, bananas, kefir, green tea, cream, rice",
-//   "make E2E SD repo pretty",
-//   "make $100,000 by tomorrow",
-//   "read paper",
-//   "arson",
-//   "launder the children's money",
-//   "think of other fake todos to do",
-// ];
-
-// const spaces = [
-//   "CS 15",
-//   "High Paying Job",
-//   "Art Class",
-//   "Swimning",
-//   "Clibbing",
-// ];
+import { all } from "axios";
 
 const maxTodosDisplayed = 6;
 
-export default function Sidebar({ todos, deliverables, spaces }) {
-  const [allTasks, setAllTasks] = useState([...todos, ...deliverables]);
-  const [userSpaces, setUserSpaces] = useState(spaces);
+export default function Sidebar({
+  userTodos,
+  setUserTodos,
+  userDeliverables,
+  setUserDeliverables,
+  userSpaces,
+  setUserSpaces,
+  user,
+}) {
+  const [allTasks, setAllTasks] = useState([...userTodos, ...userDeliverables]);
+  const [showSpacePopUp, setShowSpacePopUp] = useState(false);
 
   useEffect(() => {
-    setAllTasks([...todos, ...deliverables]);
-  }, [todos, deliverables]);
+    setAllTasks([...userTodos, ...userDeliverables]);
+  }, [userTodos, userDeliverables]);
 
   useEffect(() => {
-    setUserSpaces(spaces);
-  }, [spaces]);
+    setUserSpaces(userSpaces);
+  }, [userSpaces]);
 
   return (
     <div className="sidebar-wrapper">
@@ -59,10 +47,35 @@ export default function Sidebar({ todos, deliverables, spaces }) {
         <div className="sidebar-bottom-widget">
           {userSpaces.map((space, i) => (
             <div key={i} className="space-wrapper">
-              <p className="space">{space.title}</p>
+              <p className="space">{space.name}</p>
+              <button className="hide-space-button">
+                <img
+                  src="/eye.svg"
+                  alt="Hide space icon"
+                  className="hide-space-icon"
+                />
+              </button>
             </div>
           ))}
+          <div className="add-space">
+            <button
+              className="add-space-button"
+              onClick={() => setShowSpacePopUp(!showSpacePopUp)}
+            >
+              + add space
+            </button>
+          </div>
         </div>
+        {showSpacePopUp && (
+          <AddSpacePopUp
+            setAddSpacePopUp={setShowSpacePopUp}
+            userDeliverables={userDeliverables}
+            setUserDeliverables={setUserDeliverables}
+            userSpaces={userSpaces}
+            setUserSpaces={setUserSpaces}
+            user={user}
+          />
+        )}
         <h1 className="sidebar-bottom-title">Your Spaces</h1>
       </div>
     </div>
