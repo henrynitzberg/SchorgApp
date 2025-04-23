@@ -5,6 +5,7 @@ export default function NewEventForm({
   position,
   initialStartTime,
   initialEndTime,
+  deliverables,
   onClose,
   onSave,
   editMode,
@@ -91,13 +92,21 @@ export default function NewEventForm({
           const endMinute = parseInt(endTime.split(":")[1]);
 
           // Check if start time is before end time
-          if (startHour > endHour || startHour === endHour && startMinute >= endMinute) {
+          if (
+            startHour > endHour ||
+            (startHour === endHour && startMinute >= endMinute)
+          ) {
             setTimeErrorMessage("Start time must be before end time.");
             clearErrorAfterDelay();
             return;
           }
 
-          if (startHour < 0 || startHour > 23 || startMinute < 0 || startMinute > 59) {
+          if (
+            startHour < 0 ||
+            startHour > 23 ||
+            startMinute < 0 ||
+            startMinute > 59
+          ) {
             setTimeErrorMessage("Please enter a valid start time.");
             clearErrorAfterDelay();
             return;
@@ -108,7 +117,17 @@ export default function NewEventForm({
             return;
           }
 
-          onSave({ title, description, startTime, endTime });
+          const deliverableTitle = form.deliverable.value;
+          const deliverable = deliverables.find(
+            (deliverable) => deliverable.title === deliverableTitle
+          );
+          // if (!deliverable) {
+          //   setTimeErrorMessage("Please select a valid deliverable.");
+          //   clearErrorAfterDelay();
+          //   return;
+          // }
+
+          onSave({ title, description, startTime, endTime, deliverable });
           onClose();
         }}
       >
@@ -122,6 +141,7 @@ export default function NewEventForm({
           />
         </div>
         {titleErrorMessage && <div className="error">{titleErrorMessage}</div>}
+
         <div>
           <textarea
             name="description"
@@ -133,7 +153,7 @@ export default function NewEventForm({
           />
         </div>
 
-        <h1 className="event-popup-duration-title">Duration</h1>
+        <h1 className="event-popup-subtitle">Duration</h1>
         <div className="event-popup-duration-wrapper">
           <div>
             <input
@@ -156,6 +176,24 @@ export default function NewEventForm({
           </div>
         </div>
         {timeErrorMessage && <div className="error">{timeErrorMessage}</div>}
+
+        <h1 className="event-popup-subtitle">Deliverable</h1>
+        <div>
+          <select
+            name="deliverable"
+            className="deliverable-select"
+          >
+            <option value="">
+              (none)
+            </option>
+            {deliverables.map((deliverable, i) => (
+              <option key={i} value={deliverable.title}>
+                {deliverable.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="event-popup-bottom-buttons-wrapper">
           <button className="event-popup-button" type="submit">
             submit

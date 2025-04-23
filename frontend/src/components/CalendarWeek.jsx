@@ -13,6 +13,13 @@ export default function CalendarWeek({
   todos,
   deliverables,
 }) {
+  // const printTodos = (() => {
+  //   todos.map((todo) => {
+  //     console.log(todo);
+  //   });
+  // })();
+
+  // printTodos;
   const [userTodos, setUserTodos] = useState([]);
   const [userDeliverables, setUserDeliverables] = useState([]);
 
@@ -36,7 +43,7 @@ export default function CalendarWeek({
   
     const end_time = new Date(selectedDay);
     end_time.setHours(endHour, endMinute);
-  
+    
     setUserTodos((prev) => [
       ...prev,
       {
@@ -44,6 +51,7 @@ export default function CalendarWeek({
         description: newEventData.description,
         start_time,
         end_time,
+        deliverable: newEventData.deliverable,
       },
     ]);
   };
@@ -166,6 +174,7 @@ export default function CalendarWeek({
                 position={eventPopupPosition}
                 initialStartTime={initialStartTime}
                 initialEndTime={initialEndTime}
+                deliverables={userDeliverables}
                 onClose={() => {
                     setShowEventPopup(false);
                     setclickedOutOfPopupPopup(true);
