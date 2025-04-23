@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format } from "date-fns";
-import NewEventForm from "./NewEventForm";
+import NewTodoForm from "./NewToDoForm";
 
 import "../css/CalendarWeek.css";
+import NewDeliverableForm from "./NewDeliverableForm";
 
 const hours = Array.from({ length: 24 }, (_, i) => i); // 0 to 23
 const hourHeight = 4; // 4em
@@ -13,16 +14,10 @@ export default function CalendarWeek({
   todos,
   deliverables,
 }) {
-  // const printTodos = (() => {
-  //   todos.map((todo) => {
-  //     console.log(todo);
-  //   });
-  // })();
-
-  // printTodos;
   const [userTodos, setUserTodos] = useState([]);
   const [userDeliverables, setUserDeliverables] = useState([]);
 
+  // need pop up specific variables...
   const [showEventPopup, setShowEventPopup] = useState(false);
   const [clickedOutOfPopup, setclickedOutOfPopupPopup] = useState(false);
   const [eventPopupDay, setEventPopupDay] = useState(-1);
@@ -32,17 +27,18 @@ export default function CalendarWeek({
   const [initialStartTime, setInitialStartTime] = useState("00:00"); // optional
   const initialDuration = 1; // in hours
   const [initialEndTime, setInitialEndTime] = useState("00:00"); // optional
+
   const handleSaveNewEvent = (newEventData) => {
     // Convert to full datetime using selectedDay
     const [startHour, startMinute] = newEventData.startTime.split(":");
     const [endHour, endMinute] = newEventData.endTime.split(":");
-
 
     const start_time = new Date(selectedDay);
     start_time.setHours(startHour, startMinute);
 
     const end_time = new Date(selectedDay);
     end_time.setHours(endHour, endMinute);
+
     setUserTodos((prev) => [
       ...prev,
       {
@@ -82,7 +78,7 @@ export default function CalendarWeek({
     <div className="calendar-week-wrapper">
       <div className="calendar-week-headers-wrapper">
         <div className="gap-for-hours"> </div>
-        {days.map((day, i) => {
+        {days.map((day, index) => {
           const isToday =
             format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
           return (
@@ -92,8 +88,46 @@ export default function CalendarWeek({
                   ? "calendar-week-today-header"
                   : "calendar-week-day-header"
               }
-              key={i}
+              key={index}
+              onClick={(e) => {
+                if (showEventPopup || clickedOutOfPopup) {
+                  setclickedOutOfPopupPopup(false);
+                  return;
+                }
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                setEventPopupDay(index);
+                setEventPopupPosition({ x, y });
+                setShowEventPopup(true);
+                setSelectedDay(day);
+              }}
             >
+              {showEventPopup &&
+                eventPopupDay == index &&
+                (console.log(eventPopupPosition),
+                (
+                  <NewDeliverableForm
+                    position={eventPopupPosition}
+                    onClose={() => {
+                      setShowEventPopup(false);
+                      setclickedOutOfPopupPopup(true);
+                    }}
+                  />
+                ))
+                // <NewTodoForm
+                //   position={eventPopupPosition}
+                //   initialStartTime={initialStartTime}
+                //   initialEndTime={initialEndTime}
+                //   deliverables={userDeliverables}
+                //   onClose={() => {
+                //       setShowEventPopup(false);
+                //       setclickedOutOfPopupPopup(true);
+                //     }}
+                //   onSave={handleSaveNewEvent}
+                //   editMode={false}
+                // />
+              }
               <h1 className="number-date">{format(day, "MM/dd")}</h1>
               <h1 className="weekday">{format(day, "EEE")}</h1>
               <div className="dots-wrapper">
@@ -152,33 +186,33 @@ export default function CalendarWeek({
               const clickedHour = y / pixelsPerHour;
               const hour = Math.floor(clickedHour);
               // floor to nearest 15 minutes
-
-              const minutes = Math.floor(Math.floor((clickedHour - hour) * 60) / 15) * 15;
-              const formattedStartTime = `${hour.toString().padStart(2, "0")}:${minutes
+              const minutes =
+                Math.floor(Math.floor((clickedHour - hour) * 60) / 15) * 15;
+              const formattedStartTime = `${hour
                 .toString()
-                .padStart(2, "0")}`;
+                .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
               setInitialStartTime(formattedStartTime);
               if (24 - clickedHour < initialDuration) {
                 setInitialEndTime("23:59");
               } else {
-                const formattedEndTime = `${(hour + initialDuration).toString().padStart(2, "0")}:${minutes
+                const formattedEndTime = `${(hour + initialDuration)
                   .toString()
-                  .padStart(2, "0")}`;
+                  .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
                 setInitialEndTime(formattedEndTime);
               }
               setSelectedDay(day);
             }}
           >
             {showEventPopup && eventPopupDay == index && (
-              <NewEventForm
+              <NewTodoForm
                 position={eventPopupPosition}
                 initialStartTime={initialStartTime}
                 initialEndTime={initialEndTime}
                 deliverables={userDeliverables}
                 onClose={() => {
-                    setShowEventPopup(false);
-                    setclickedOutOfPopupPopup(true);
-                  }}
+                  setShowEventPopup(false);
+                  setclickedOutOfPopupPopup(true);
+                }}
                 onSave={handleSaveNewEvent}
                 editMode={false}
               />

@@ -32,6 +32,9 @@
     padding: .25em; 
     text-align: center;
     align-items: center;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
 
 .calendar-week-today-header {
@@ -44,6 +47,9 @@
     padding: .25em; 
     text-align: center;
     align-items: center;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
 
 .number-date {
@@ -118,6 +124,9 @@
     font-size: 14px;
     font-weight: 400;
     color: var(--lighter-gray);
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
 
 .calendar-event {
@@ -154,4 +163,11 @@
     right: 0;
     height: 2px;
     background-color: var(--red);
+}
+
+.popup-background {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    z-index: 100;
 }
