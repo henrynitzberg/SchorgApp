@@ -1,0 +1,40 @@
+.add-space-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    background-color: var(--dark-gray);
+    width: 200px;
+    position: absolute;
+    z-index: 1;
+
+    bottom: -3em;
+    right: -10em;
+    padding: 0.5em 0.75em;
+    border-radius: 5px;
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--gray);
+}
+
+.add-space-input-header {
+    font-size: 14px;  
+}
+
+.add-space-input {
+    width: 100%;
+    background-color: var(--dark-gray);
+    border: none;
+    padding: 0.25em 0.5em;
+    font-size: 14px;
+    color: var(--text-gray);
+    border-bottom: 1px solid var(--gray);
+}
+
+.add-space-confirm {
+    background-color: var(--gray);
+    font-size: 14px;
+    padding: 0.5em 0.75em;
+    border-radius: 5px;
+    width: 50%;
+    place-self: end;
+}

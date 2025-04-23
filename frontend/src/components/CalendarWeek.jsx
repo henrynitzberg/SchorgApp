@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format } from "date-fns";
+import NewEventForm from "./NewEventForm";
 
 import "../css/CalendarWeek.css";
 
@@ -12,8 +13,48 @@ export default function CalendarWeek({
   todos,
   deliverables,
 }) {
+  // const printTodos = (() => {
+  //   todos.map((todo) => {
+  //     console.log(todo);
+  //   });
+  // })();
+
+  // printTodos;
   const [userTodos, setUserTodos] = useState([]);
   const [userDeliverables, setUserDeliverables] = useState([]);
+
+  const [showEventPopup, setShowEventPopup] = useState(false);
+  const [clickedOutOfPopup, setclickedOutOfPopupPopup] = useState(false);
+  const [eventPopupDay, setEventPopupDay] = useState(-1);
+  const [eventPopupPosition, setEventPopupPosition] = useState({ x: 0, y: 0 });
+
+  const [selectedDay, setSelectedDay] = useState(null); // For assigning event to day
+  const [initialStartTime, setInitialStartTime] = useState("00:00"); // optional
+  const initialDuration = 1; // in hours
+  const [initialEndTime, setInitialEndTime] = useState("00:00"); // optional
+
+  const handleSaveNewEvent = (newEventData) => {
+    // Convert to full datetime using selectedDay
+    const [startHour, startMinute] = newEventData.startTime.split(":");
+    const [endHour, endMinute] = newEventData.endTime.split(":");
+
+    const start_time = new Date(selectedDay);
+    start_time.setHours(startHour, startMinute);
+
+    const end_time = new Date(selectedDay);
+    end_time.setHours(endHour, endMinute);
+
+    setUserTodos((prev) => [
+      ...prev,
+      {
+        title: newEventData.title,
+        description: newEventData.description,
+        start_time,
+        end_time,
+        deliverable: newEventData.deliverable,
+      },
+    ]);
+  };
 
   useEffect(() => {
     setUserTodos(todos);
@@ -84,9 +125,9 @@ export default function CalendarWeek({
         <div className="calendar-week-hours-wrapper">
           {hours.map((hour, index) => (
             <h1
+              key={index}
               className="calendar-week-hour-label"
               style={{ height: `${pixelsPerHour}px` }}
-              key={index}
             >
               {" "}
               {hour}:00{" "}
@@ -94,7 +135,56 @@ export default function CalendarWeek({
           ))}
         </div>
         {days.map((day, index) => (
-          <div key={index} className="calendar-week-day-body">
+          <div
+            key={index}
+            className="calendar-week-day-body"
+            onClick={(e) => {
+              if (showEventPopup || clickedOutOfPopup) {
+                setclickedOutOfPopupPopup(false);
+                return;
+              }
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              setEventPopupDay(index);
+              setEventPopupPosition({ x, y });
+              setShowEventPopup(true);
+
+              const clickedHour = y / pixelsPerHour;
+              const hour = Math.floor(clickedHour);
+              // floor to nearest 15 minutes
+              const minutes =
+                Math.floor(Math.floor((clickedHour - hour) * 60) / 15) * 15;
+              const formattedStartTime = `${hour
+                .toString()
+                .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+              setInitialStartTime(formattedStartTime);
+              if (24 - clickedHour < initialDuration) {
+                setInitialEndTime("23:59");
+              } else {
+                const formattedEndTime = `${(hour + initialDuration)
+                  .toString()
+                  .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+                setInitialEndTime(formattedEndTime);
+              }
+              setSelectedDay(day);
+            }}
+          >
+            {showEventPopup && eventPopupDay == index && (
+              <NewEventForm
+                position={eventPopupPosition}
+                initialStartTime={initialStartTime}
+                initialEndTime={initialEndTime}
+                deliverables={userDeliverables}
+                onClose={() => {
+                  setShowEventPopup(false);
+                  setclickedOutOfPopupPopup(true);
+                }}
+                onSave={handleSaveNewEvent}
+                editMode={false}
+              />
+            )}
+
             {hours.map((hour) => (
               <div
                 key={hour}
@@ -132,13 +222,6 @@ export default function CalendarWeek({
                   new Date(event.end_time).getMinutes() / 60;
                 const top = startHour * pixelsPerHour;
                 const height = (endHour - startHour) * pixelsPerHour;
-                console.log(startHour, endHour);
-                console.log(
-                  new Date(event.start_time).getHours(),
-                  new Date(event.end_time).getHours(),
-                  new Date(event.start_time).getMinutes() / 60,
-                  new Date(event.end_time).getMinutes() / 60
-                );
                 return (
                   <div
                     key={index}
