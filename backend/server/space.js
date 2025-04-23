@@ -6,7 +6,7 @@ const mongo_uri = process.env.MONGO_URI;
 
 const client = new MongoClient(mongo_uri);
 
-async function getSpace(name) {
+async function getSpace(access_code) {
     try {
         await client.connect();
 
@@ -14,8 +14,10 @@ async function getSpace(name) {
         const collection = db.collection("Spaces");
 
         const space = await collection.findOne({
-            name: name
+            access_code: access_code
         });
+
+        console.log(space);
 
         return space;
     }
@@ -27,6 +29,29 @@ async function getSpace(name) {
     }
 }
 
+async function writePeople(spaceId, people) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const spaces = db.collection("Spaces");
+
+        await spaces.updateOne(
+            { _id: ObjectId.createFromHexString(spaceId) },
+            { $push: {
+                people: {
+                    $each: people
+                }
+            } }
+        );
+    }
+    catch (err) {
+        console.error(err);
+        throw err;
+    }
+}
+
 module.exports = {
-    getSpace: getSpace
+    getSpace: getSpace,
+    writePeople: writePeople,
 };

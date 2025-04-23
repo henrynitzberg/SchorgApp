@@ -32,18 +32,17 @@ export default function CalendarWeek({
   const [initialStartTime, setInitialStartTime] = useState("00:00"); // optional
   const initialDuration = 1; // in hours
   const [initialEndTime, setInitialEndTime] = useState("00:00"); // optional
-  
   const handleSaveNewEvent = (newEventData) => {
     // Convert to full datetime using selectedDay
     const [startHour, startMinute] = newEventData.startTime.split(":");
     const [endHour, endMinute] = newEventData.endTime.split(":");
-  
+
+
     const start_time = new Date(selectedDay);
     start_time.setHours(startHour, startMinute);
-  
+
     const end_time = new Date(selectedDay);
     end_time.setHours(endHour, endMinute);
-    
     setUserTodos((prev) => [
       ...prev,
       {
@@ -153,6 +152,7 @@ export default function CalendarWeek({
               const clickedHour = y / pixelsPerHour;
               const hour = Math.floor(clickedHour);
               // floor to nearest 15 minutes
+
               const minutes = Math.floor(Math.floor((clickedHour - hour) * 60) / 15) * 15;
               const formattedStartTime = `${hour.toString().padStart(2, "0")}:${minutes
                 .toString()

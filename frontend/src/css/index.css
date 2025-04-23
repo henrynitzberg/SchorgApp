@@ -73,3 +73,13 @@ p {
     font-family: "Quicksand";
     color: white;
 }
+
+button {
+  border: none;
+  text-decoration: none;
+  background-color: none;
+}
+
+input:focus {
+  outline:none;
+}

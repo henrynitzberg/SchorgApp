@@ -1,56 +1,130 @@
 const { MongoClient } = require("mongodb");
 const ObjectId = require("mongodb").ObjectId;
+const bcrypt = require("bcrypt");
 
 const dotenv = require("dotenv").config();
 const mongo_uri = process.env.MONGO_URI;
 
 const client = new MongoClient(mongo_uri);
 
-async function testConnection() {
-    try {
-        await client.connect();
-
-        console.log("Connected successfully");
-        const db = client.db("sample_mflix");
-
-        const collection = db.collection("comments");
-
-        const comment = await collection.findOne({
-            name: "John Bishop"
-        });
-
-        return comment;
-    }
-    catch (err) {
-        return err;
-    }
-    finally {
-        // await client.close();
-    }
-}
-
 async function getUser(email) {
     try {
         await client.connect();
 
         const db = client.db("Gage");
-        const collection = db.collection("Users");
+        const users = db.collection("Users");
 
-        const user = await collection.findOne({
+        const user = await users.findOne({
             email: email
         });
 
         return user;
     }
     catch (err) {
+        console.error(err);
         throw err;
     }
-    finally {
-        // await client.close();
+}
+
+async function registerUserStandard(first_name, last_name, email, password) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        await users.insertOne({
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            password: hashedPassword,
+            todos: [],
+            user_deliverables: [],
+            user_spaces: [],
+            is_google: false
+        });
+
+        return await getUser(email);
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+async function registerUserGoogle(first_name, last_name, email) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        await users.insertOne({
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            password: null,
+            todos: [],
+            user_deliverables: [],
+            user_spaces: [],
+            is_google: true
+        });
+
+        return await getUser(email);
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+async function writeDeliverables(email, deliverables) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        await users.updateOne(
+            { email: email },
+            { $push: {
+                user_deliverables: {
+                    $each: deliverables
+                }
+            } }
+        );
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+async function writeSpaces(email, spaces) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        await users.updateOne(
+            { email: email },
+            { $push: {
+                user_spaces: {
+                    $each: spaces
+                }
+            } }
+        );
+    }
+    catch (err) {
+        throw err;
     }
 }
 
 module.exports = {
-    testConnection: testConnection,
-    getUser, getUser
+    getUser: getUser,
+    registerUserStandard: registerUserStandard,
+    registerUserGoogle: registerUserGoogle,
+    writeDeliverables: writeDeliverables,
+    writeSpaces: writeSpaces
 }
