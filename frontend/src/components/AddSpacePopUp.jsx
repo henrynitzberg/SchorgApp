@@ -28,6 +28,14 @@ export default function AddSpacePopUp({
       const space = await axios.post(APP_URL + "/space/info", {
         access_code: enteredToken,
       });
+
+      for (const userSpace of userSpaces) {
+        if (space.data._id === userSpace._id) {
+          alert("You're already registered for this class.");
+          return;
+        }
+      }
+
       setUserSpaces([...userSpaces, space.data]);
       const spaceDeliverables = space.data.space_deliverables;
       const newDeliverables = [];

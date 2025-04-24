@@ -63,15 +63,29 @@
     font-weight: 700;
 }
 
-.space-wrapper {
+.space-selector-wrapper {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     gap: 0.5em;
     padding: 0.5em 0.75em;
-    background-color: var(--blue);
+    /* background-color: var(--gray); */
+    background: linear-gradient(to right, var(--blue), var(--gray));
     border-radius: 5px;
+    /* overflow: hidden; */
+}
+
+.space-selector {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background-color: transparent;
+
+    width: fit-content;
 }
 
 .dot {
@@ -81,7 +95,7 @@
     background-color: var(--blue);
 }
 
-.upcoming-todo, .space {
+.upcoming-todo {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -91,9 +105,9 @@
 }
 
 .hide-space-button {
-    background-color: var(--blue);
     display: grid;
     place-content: center;
+    background-color: transparent;
 }
 
 .hide-space-icon {

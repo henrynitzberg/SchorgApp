@@ -15,9 +15,13 @@ export default function Sidebar({
   userSpaces,
   setUserSpaces,
   user,
+  openSpace,
 }) {
   const [allTasks, setAllTasks] = useState([...userTodos, ...userDeliverables]);
   const [showSpacePopUp, setShowSpacePopUp] = useState(false);
+  const [shownSpaces, setShownSpaces] = useState(
+    Array(userSpaces.length).fill(true)
+  );
 
   useEffect(() => {
     setAllTasks([...userTodos, ...userDeliverables]);
@@ -25,7 +29,10 @@ export default function Sidebar({
 
   useEffect(() => {
     setUserSpaces(userSpaces);
+    setShownSpaces([...shownSpaces, true]);
   }, [userSpaces]);
+
+  const spaches = [{ name: "CS daj adiow adi awid fweifhweo" }];
 
   return (
     <div className="sidebar-wrapper">
@@ -45,12 +52,13 @@ export default function Sidebar({
       </div>
       <div className="sidebar-bottom">
         <div className="sidebar-bottom-widget">
-          {userSpaces.map((space, i) => (
-            <div key={i} className="space-wrapper">
-              <p className="space">{space.name}</p>
+          {spaches.map((space, i) => (
+            <div key={i} className="space-selector-wrapper">
+              <button className="space-selector">{space.name}</button>
+
               <button className="hide-space-button">
                 <img
-                  src="/eye.svg"
+                  src="/hide.svg"
                   alt="Hide space icon"
                   className="hide-space-icon"
                 />

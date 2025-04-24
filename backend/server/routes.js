@@ -158,6 +158,7 @@ app.post("/space/info", async (req, res) => {
         return res.send(fetchedSpace);
     }
     catch (err) {
+        console.error(err);
         return res.status(404).send({ error: err });
     }
 })

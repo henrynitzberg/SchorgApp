@@ -10,8 +10,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Auth />}></Route>
-        <Route path="/gage" element={<Gage />}></Route>
+        <Route path="/" element={<Auth />} />
+        <Route path="/gage" element={<Gage />} />
       </Routes>
     </BrowserRouter>
   );

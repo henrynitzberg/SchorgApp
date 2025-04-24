@@ -5,6 +5,7 @@ import axios from "axios";
 // import { fetchUserData } from "../crud.js";
 import Sidebar from "../components/Sidebar.jsx";
 import CalendarWeek from "../components/CalendarWeek.jsx";
+import SelectedSpace from "../components/SelectedSpace.jsx";
 
 import "../css/Gage.css";
 
@@ -18,6 +19,15 @@ export default function Gage() {
   const [userDeliverables, setUserDeliverables] = useState([]);
   const [userSpaces, setUserSpaces] = useState([]);
   const [gageUser, setGageUser] = useState(null);
+
+  const [view, setView] = useState("calendarWeek");
+  const [selectedSpaceInfo, setSelectedSpaceInfo] = useState(null);
+
+  function openSpace(e, space) {
+    e.preventDefault();
+    setView("space");
+    setSelectedSpaceInfo(space);
+  }
 
   useEffect(() => {
     const auth = localStorage.getItem("auth");
@@ -57,9 +67,13 @@ export default function Gage() {
         userSpaces={userSpaces}
         setUserSpaces={setUserSpaces}
         user={gageUser}
+        openSpace={openSpace}
       />
       <div className="hero-wrapper">
-        <CalendarWeek todos={userTodos} deliverables={userDeliverables} />
+        {view === "calendarWeek" && (
+          <CalendarWeek todos={userTodos} deliverables={userDeliverables} />
+        )}
+        {view === "space" && <SelectedSpace space={selectedSpaceInfo} />}
       </div>
     </div>
   );
