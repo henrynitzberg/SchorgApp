@@ -171,7 +171,23 @@ app.put("/user/update-todos", async (req, res) => {
         await user.writeTodos(email, newTodos);
         
         return res.status(200).json({
-            message: "Successfully updated user todos."
+            message: "Successfully updated todos."
+        });
+    }
+    catch (err) {
+        return res.status(400).json({ message: "Failed to update todos." })
+    }
+})
+
+app.put("/user/remove-todos", async (req, res) => {
+    const email = req.body.email;
+    const removedTodos = req.body.removed_todos;
+
+    try {
+        await user.removeTodos(email, removedTodos);
+        
+        return res.status(200).json({
+            message: "Successfully removed todos."
         });
     }
     catch (err) {

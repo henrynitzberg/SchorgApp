@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format, set } from "date-fns";
-import NewToDoForm from "./NewToDoForm";
-import { updateUserDeliverables, updateUserTodos } from "../crud.js";
+import ToDoForm from "./toDoForm.jsx";
+import { updateUserDeliverables, updateTodos, removeTodos } from "../crud.js";
 
 import "../css/CalendarWeek.css";
 import NewDeliverableForm from "./NewDeliverableForm";
@@ -35,34 +35,6 @@ export default function CalendarWeek({
   const initialDuration = 1; // in hours
   const [initialEndTime, setInitialEndTime] = useState("00:00"); // optional
 
-  const handleSaveNewToDo = (newEventData) => {
-    // Convert to full datetime using selectedDay
-    const [startHour, startMinute] = newEventData.startTime.split(":");
-    const [endHour, endMinute] = newEventData.endTime.split(":");
-
-    const start_time = new Date(selectedDay);
-    start_time.setHours(startHour, startMinute);
-
-    const end_time = new Date(selectedDay);
-    end_time.setHours(endHour, endMinute);
-
-    const todo = {
-      title: newEventData.title,
-      description: newEventData.description,
-      start_time,
-      end_time,
-      deliverable: newEventData.deliverable,
-      space: null,
-    };
-
-    updateUserTodos(user.email, [ todo ]);
-
-    setUserTodos((prev) => [
-      ...prev,
-      todo,
-    ]);
-  };
-
   const handleSaveNewDeliverable = (newEventData) => {
     const [dueMonth, dueDay, dueYear] = newEventData.dueDate.split("/");
     const [dueHour, dueMinute] = newEventData.dueTime.split(":");
@@ -84,9 +56,40 @@ export default function CalendarWeek({
       space_deliverable: null,
     };
 
-    updateUserDeliverables(user.email, [ deliverable ]);
+    updateUserDeliverables(user.email, [deliverable]);
 
     setUserDeliverables((prev) => [...prev, deliverable]);
+  };
+
+  const handleSaveNewToDo = (newEventData) => {
+    // Convert to full datetime using selectedDay
+    const [startHour, startMinute] = newEventData.startTime.split(":");
+    const [endHour, endMinute] = newEventData.endTime.split(":");
+
+    const start_time = new Date(selectedDay);
+    start_time.setHours(startHour, startMinute);
+
+    const end_time = new Date(selectedDay);
+    end_time.setHours(endHour, endMinute);
+
+    const todo = {
+      title: newEventData.title,
+      description: newEventData.description,
+      start_time,
+      end_time,
+      deliverable: newEventData.deliverable,
+      space: null,
+    };
+
+    updateTodos(user.email, [todo]);
+
+    setUserTodos((prev) => [...prev, todo]);
+  };
+
+  const handleRemoveToDo = (e, eventData) => {
+    e.preventDefault();
+    removeTodos(user.email, [eventData]);
+    setUserTodos((prev) => prev.filter((todo) => todo !== eventData));
   };
 
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
@@ -220,7 +223,7 @@ export default function CalendarWeek({
             }}
           >
             {showToDoPopup && eventPopupDay == index && (
-              <NewToDoForm
+              <ToDoForm
                 position={toDoPopupPosition}
                 initialStartTime={initialStartTime}
                 initialEndTime={initialEndTime}
@@ -278,6 +281,9 @@ export default function CalendarWeek({
                     style={{
                       top: `${top}px`,
                       height: `${height}px`,
+                    }}
+                    onContextMenu={(e) => {
+                      handleRemoveToDo(e, event);
                     }}
                   >
                     <h1 className="calendar-event-title"> {event.title} </h1>

@@ -26,11 +26,22 @@ export async function updateUserDeliverables(email, deliverables) {
     }
 }
 
-export async function updateUserTodos(email, todos) {
+export async function updateTodos(email, todos) {
     try {
         await axios.put(APP_URL + "/user/update-todos", {
             email: email,
             new_todos: todos,
+        });
+    } catch (err) {
+        throw err;
+    }
+}
+
+export async function removeTodos(email, todos) {
+    try {
+        await axios.put(APP_URL + "/user/remove-todos", {
+            email: email,
+            todos: todos
         });
     } catch (err) {
         throw err;
