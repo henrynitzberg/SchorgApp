@@ -71,7 +71,13 @@ export default function Gage() {
       />
       <div className="hero-wrapper">
         {view === "calendarWeek" && (
-          <CalendarWeek todos={userTodos} deliverables={userDeliverables} />
+          <CalendarWeek
+            user={gageUser}
+            userTodos={userTodos}
+            setUserTodos={setUserTodos}
+            userDeliverables={userDeliverables}
+            setUserDeliverables={setUserDeliverables}
+          />
         )}
         {view === "space" && <SelectedSpace space={selectedSpaceInfo} />}
       </div>

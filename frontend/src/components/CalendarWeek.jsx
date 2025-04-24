@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format, set } from "date-fns";
-import NewToDoForm from "./NewToDoForm";
+import ToDoForm from "./toDoForm.jsx";
+import { updateUserDeliverables, updateTodos, removeTodos } from "../crud.js";
 
 import "../css/CalendarWeek.css";
 import NewDeliverableForm from "./NewDeliverableForm";
@@ -10,26 +11,55 @@ const hourHeight = 4; // 4em
 const pixelsPerHour = hourHeight * 16; // 1em = 16px
 
 export default function CalendarWeek({
+  user,
   startDate = new Date(),
-  todos,
-  deliverables,
+  userTodos,
+  setUserTodos,
+  userDeliverables,
+  setUserDeliverables,
 }) {
-  const [userTodos, setUserTodos] = useState([]);
-  const [userDeliverables, setUserDeliverables] = useState([]);
-
-  // need pop up specific variables...
   const [showToDoPopup, setShowToDoPopup] = useState(false);
   const [showDeliverablePopup, setShowDeliverablePopup] = useState(false);
   const [clickedOutOfToDoPopup, setClickedOutOfToDoPopup] = useState(false);
-  const [clickedOutOfDeliverablePopup, setClickedOutOfDeliverablePopup] = useState(false);
+  const [clickedOutOfDeliverablePopup, setClickedOutOfDeliverablePopup] =
+    useState(false);
   const [toDoPopupPosition, setToDoPopupPosition] = useState({ x: 0, y: 0 });
-  const [deliverablePopupPosition, setDeliverablePopupPosition] = useState({ x: 0, y: 0 });
+  const [deliverablePopupPosition, setDeliverablePopupPosition] = useState({
+    x: 0,
+    y: 0,
+  });
   const [eventPopupDay, setEventPopupDay] = useState(-1);
 
   const [selectedDay, setSelectedDay] = useState(null); // For assigning event to day
   const [initialStartTime, setInitialStartTime] = useState("00:00"); // optional
   const initialDuration = 1; // in hours
   const [initialEndTime, setInitialEndTime] = useState("00:00"); // optional
+
+  const handleSaveNewDeliverable = (newEventData) => {
+    const [dueMonth, dueDay, dueYear] = newEventData.dueDate.split("/");
+    const [dueHour, dueMinute] = newEventData.dueTime.split(":");
+
+    const due_date = new Date(
+      dueYear,
+      dueMonth - 1,
+      dueDay,
+      dueHour,
+      dueMinute
+    );
+
+    const deliverable = {
+      title: newEventData.title,
+      description: newEventData.description,
+      due_date: due_date,
+      time_worked: 0,
+      space: null,
+      space_deliverable: null,
+    };
+
+    updateUserDeliverables(user.email, [deliverable]);
+
+    setUserDeliverables((prev) => [...prev, deliverable]);
+  };
 
   const handleSaveNewToDo = (newEventData) => {
     // Convert to full datetime using selectedDay
@@ -42,41 +72,25 @@ export default function CalendarWeek({
     const end_time = new Date(selectedDay);
     end_time.setHours(endHour, endMinute);
 
-    setUserTodos((prev) => [
-      ...prev,
-      {
-        title: newEventData.title,
-        description: newEventData.description,
-        start_time,
-        end_time,
-        deliverable: newEventData.deliverable,
-      },
-    ]);
+    const todo = {
+      title: newEventData.title,
+      description: newEventData.description,
+      start_time,
+      end_time,
+      deliverable: newEventData.deliverable,
+      space: null,
+    };
+
+    updateTodos(user.email, [todo]);
+
+    setUserTodos((prev) => [...prev, todo]);
   };
 
-  const handleSaveNewDeliverable = (newEventData) => {
-    const [dueMonth, dueDay, dueYear] = newEventData.dueDate.split("/");
-    const [dueHour, dueMinute] = newEventData.dueTime.split(":");
-
-    const due_date = new Date(dueYear, dueMonth - 1, dueDay, dueHour, dueMinute);
-
-    setUserDeliverables((prev) => [
-      ...prev,
-      {
-        title: newEventData.title,
-        description: newEventData.description,
-        due_date,
-      },
-    ]);
-  }
-
-  useEffect(() => {
-    setUserTodos(todos);
-  }, [todos]);
-
-  useEffect(() => {
-    setUserDeliverables(deliverables);
-  }, [deliverables]);
+  const handleRemoveToDo = (e, eventData) => {
+    e.preventDefault();
+    removeTodos(user.email, [eventData]);
+    setUserTodos((prev) => prev.filter((todo) => todo !== eventData));
+  };
 
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -122,19 +136,17 @@ export default function CalendarWeek({
                 setSelectedDay(day);
               }}
             >
-              {
-                showDeliverablePopup && eventPopupDay == index && (
-                  <NewDeliverableForm
-                    position={deliverablePopupPosition}
-                    initialDueDay={day}
-                    onSubmit={handleSaveNewDeliverable}
-                    onClose={() => {
-                      setShowDeliverablePopup(false);
-                      setClickedOutOfDeliverablePopup(true);
-                    }}
-                  />
-                )
-              }
+              {showDeliverablePopup && eventPopupDay == index && (
+                <NewDeliverableForm
+                  position={deliverablePopupPosition}
+                  initialDueDay={day}
+                  onSubmit={handleSaveNewDeliverable}
+                  onClose={() => {
+                    setShowDeliverablePopup(false);
+                    setClickedOutOfDeliverablePopup(true);
+                  }}
+                />
+              )}
               <h1 className="number-date">{format(day, "MM/dd")}</h1>
               <h1 className="weekday">{format(day, "EEE")}</h1>
               <div className="dots-wrapper">
@@ -211,7 +223,7 @@ export default function CalendarWeek({
             }}
           >
             {showToDoPopup && eventPopupDay == index && (
-              <NewToDoForm
+              <ToDoForm
                 position={toDoPopupPosition}
                 initialStartTime={initialStartTime}
                 initialEndTime={initialEndTime}
@@ -269,6 +281,9 @@ export default function CalendarWeek({
                     style={{
                       top: `${top}px`,
                       height: `${height}px`,
+                    }}
+                    onContextMenu={(e) => {
+                      handleRemoveToDo(e, event);
                     }}
                   >
                     <h1 className="calendar-event-title"> {event.title} </h1>

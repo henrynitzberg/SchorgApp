@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import "../css/NewToDoForm.css";
+import "../css/toDoForm.css";
 
-export default function NewToDoForm({
+export default function ToDoForm({
   position,
   initialStartTime,
   initialEndTime,

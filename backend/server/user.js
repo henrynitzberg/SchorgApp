@@ -86,11 +86,67 @@ async function writeDeliverables(email, deliverables) {
         const db = client.db("Gage");
         const users = db.collection("Users");
 
+        deliverables = deliverables.map((deliverable) => {
+            return {
+                ...deliverable,
+                _id: new ObjectId()
+            }
+        });
+
         await users.updateOne(
             { email: email },
             { $push: {
                 user_deliverables: {
                     $each: deliverables
+                }
+            } }
+        );
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+async function writeTodos(email, todos) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        todos = todos.map((todo) => {
+            return {
+                ...todo,
+                _id: new ObjectId()
+            }
+        });
+
+        await users.updateOne(
+            { email: email },
+            { $push: {
+                todos: {
+                    $each: todos
+                }
+            } }
+        );
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+async function removeTodos(email, todos) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        await users.updateOne(
+            { email: email },
+            { $pull: {
+                todos: {
+                    $in: todos
                 }
             } }
         );
@@ -126,5 +182,7 @@ module.exports = {
     registerUserStandard: registerUserStandard,
     registerUserGoogle: registerUserGoogle,
     writeDeliverables: writeDeliverables,
+    writeTodos: writeTodos,
+    removeTodos: removeTodos,
     writeSpaces: writeSpaces
 }
