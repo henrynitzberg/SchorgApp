@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import AddSpacePopUp from "./AddSpacePopUp.jsx";
 
 import "../css/Sidebar.css";
-import { all } from "axios";
 
 const maxTodosDisplayed = 6;
 
@@ -19,46 +18,93 @@ export default function Sidebar({
 }) {
   const [allTasks, setAllTasks] = useState([...userTodos, ...userDeliverables]);
   const [showSpacePopUp, setShowSpacePopUp] = useState(false);
-  const [shownSpaces, setShownSpaces] = useState(
-    Array(userSpaces.length).fill(true)
-  );
 
   useEffect(() => {
     setAllTasks([...userTodos, ...userDeliverables]);
   }, [userTodos, userDeliverables]);
 
-  useEffect(() => {
-    setUserSpaces(userSpaces);
-    setShownSpaces([...shownSpaces, true]);
-  }, [userSpaces]);
+  // useEffect(() => {
+  //   setUserSpaces(userSpaces);
+  //   setShownSpaces([...shownSpaces, true]);
+  // }, [userSpaces]);
 
-  const spaches = [{ name: "CS daj adiow adi awid fweifhweo" }];
+  // useEffect(() => {
+  //   setShownSpaces((prev) => {
+  //     const newLength = userSpaces.length;
+  //     const prevLength = prev.length;
+
+  //     if (newLength > prevLength) {
+  //       // Add `true` for each new space
+  //       const added = Array(newLength - prevLength).fill(true);
+  //       return [...prev, ...added];
+  //     } else {
+  //       // If userSpaces shrank or stayed the same, just trim or return prev
+  //       return prev.slice(0, newLength);
+  //     }
+  //   });
+  // }, [userSpaces]);
+
+  // const spaches = [{ name: "CS daj adiow adi awid fweifhweo" }];
+
+  function toggleSpaceDeliverables(i) {
+    setUserSpaces((prev) => {
+      const updated = [...prev];
+      updated[i] = { ...updated[i], shown: !updated[i].shown };
+      return updated;
+    });
+
+    console.log(userSpaces);
+  }
+
+  // function showSpaceDeliverables(i, spaceId) {}
 
   return (
     <div className="sidebar-wrapper">
       <div className="sidebar-top">
         <div className="sidebar-top-widget">
-          {allTasks.slice(0, maxTodosDisplayed).map((todo, i) => (
-            <div key={i} className="upcoming-todo-wrapper">
-              <div className="dot"></div>
-              <p className="upcoming-todo">{todo.title}</p>
-            </div>
-          ))}
+          {allTasks
+            .filter((todo) => {
+              const matchingSpace = userSpaces.find(
+                (space) => space._id === todo.space
+              );
+              return matchingSpace ? matchingSpace.shown !== false : true;
+            })
+            .slice(0, maxTodosDisplayed)
+            .map((todo, i) => (
+              <div key={i} className="upcoming-todo-wrapper">
+                <div className="dot"></div>
+                <p className="upcoming-todo">{todo.title}</p>
+              </div>
+            ))}
           {allTasks.length > maxTodosDisplayed && (
             <div className="sidebar-overflow-text">see more tasks</div>
+          )}
+          {allTasks.length <= 0 && (
+            <div className="sidebar-empty-text-wrapper">
+              <h1 className="sidebar-empty-text">Showing no tasks...</h1>
+            </div>
           )}
         </div>
         <h1 className="sidebar-top-title">Todo</h1>
       </div>
       <div className="sidebar-bottom">
         <div className="sidebar-bottom-widget">
-          {spaches.map((space, i) => (
+          {userSpaces.map((space, i) => (
             <div key={i} className="space-selector-wrapper">
-              <button className="space-selector">{space.name}</button>
+              <button
+                className="space-selector"
+                onClick={(e) => openSpace(e, space)}
+              >
+                {space.name}
+              </button>
 
-              <button className="hide-space-button">
+              <button
+                className="hide-space-button"
+                onClick={() => toggleSpaceDeliverables(i, space._id)}
+              >
+                {console.log(space)}
                 <img
-                  src="/hide.svg"
+                  src={space.shown ? "/hide.svg" : "/eye.svg"}
                   alt="Hide space icon"
                   className="hide-space-icon"
                 />

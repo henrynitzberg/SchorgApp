@@ -164,7 +164,7 @@ app.post("/space/info", async (req, res) => {
 })
 
 app.put("/user/update-todos", (req, res) => {
-    const newDeliverables = req.body.new_deliverables;
+    const newTodos = req.body.new_todos;
 })
 
 app.put("/user/update-deliverables", async (req, res) => {
