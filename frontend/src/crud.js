@@ -26,6 +26,17 @@ export async function updateUserDeliverables(email, deliverables) {
     }
 }
 
+export async function updateUserTodos(email, todos) {
+    try {
+        await axios.put(APP_URL + "/user/update-todos", {
+            email: email,
+            new_todos: todos,
+        });
+    } catch (err) {
+        throw err;
+    }
+}
+
 export async function updateUserSpaces(email, spaces) {
     try {
         await axios.put(APP_URL + "/user/update-spaces", {

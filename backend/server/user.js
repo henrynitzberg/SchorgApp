@@ -100,6 +100,27 @@ async function writeDeliverables(email, deliverables) {
     }
 }
 
+async function writeTodos(email, todos) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        await users.updateOne(
+            { email: email },
+            { $push: {
+                todos: {
+                    $each: todos
+                }
+            } }
+        );
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
 async function writeSpaces(email, spaces) {
     try {
         await client.connect();
@@ -126,5 +147,6 @@ module.exports = {
     registerUserStandard: registerUserStandard,
     registerUserGoogle: registerUserGoogle,
     writeDeliverables: writeDeliverables,
+    writeTodos: writeTodos,
     writeSpaces: writeSpaces
 }

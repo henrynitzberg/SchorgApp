@@ -163,8 +163,20 @@ app.post("/space/info", async (req, res) => {
     }
 })
 
-app.put("/user/update-todos", (req, res) => {
-    const newDeliverables = req.body.new_deliverables;
+app.put("/user/update-todos", async (req, res) => {
+    const email = req.body.email;
+    const newTodos = req.body.new_todos;
+
+    try {
+        await user.writeTodos(email, newTodos);
+        
+        return res.status(200).json({
+            message: "Successfully updated user todos."
+        });
+    }
+    catch (err) {
+        return res.status(400).json({ message: "Failed to update todos." })
+    }
 })
 
 app.put("/user/update-deliverables", async (req, res) => {
@@ -179,7 +191,7 @@ app.put("/user/update-deliverables", async (req, res) => {
         });
     }
     catch (err) {
-        return res.status(400).json({ message: "Update failed." })
+        return res.status(400).json({ message: "Failed to update deliverables." })
     }
 })
 

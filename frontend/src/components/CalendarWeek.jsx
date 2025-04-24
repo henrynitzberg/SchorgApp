@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format, set } from "date-fns";
 import NewToDoForm from "./NewToDoForm";
+import { updateUserDeliverables, updateUserTodos } from "../crud.js";
 
 import "../css/CalendarWeek.css";
 import NewDeliverableForm from "./NewDeliverableForm";
@@ -10,20 +11,23 @@ const hourHeight = 4; // 4em
 const pixelsPerHour = hourHeight * 16; // 1em = 16px
 
 export default function CalendarWeek({
+  user,
   startDate = new Date(),
-  todos,
-  deliverables,
+  userTodos,
+  setUserTodos,
+  userDeliverables,
+  setUserDeliverables,
 }) {
-  const [userTodos, setUserTodos] = useState([]);
-  const [userDeliverables, setUserDeliverables] = useState([]);
-
-  // need pop up specific variables...
   const [showToDoPopup, setShowToDoPopup] = useState(false);
   const [showDeliverablePopup, setShowDeliverablePopup] = useState(false);
   const [clickedOutOfToDoPopup, setClickedOutOfToDoPopup] = useState(false);
-  const [clickedOutOfDeliverablePopup, setClickedOutOfDeliverablePopup] = useState(false);
+  const [clickedOutOfDeliverablePopup, setClickedOutOfDeliverablePopup] =
+    useState(false);
   const [toDoPopupPosition, setToDoPopupPosition] = useState({ x: 0, y: 0 });
-  const [deliverablePopupPosition, setDeliverablePopupPosition] = useState({ x: 0, y: 0 });
+  const [deliverablePopupPosition, setDeliverablePopupPosition] = useState({
+    x: 0,
+    y: 0,
+  });
   const [eventPopupDay, setEventPopupDay] = useState(-1);
 
   const [selectedDay, setSelectedDay] = useState(null); // For assigning event to day
@@ -42,15 +46,20 @@ export default function CalendarWeek({
     const end_time = new Date(selectedDay);
     end_time.setHours(endHour, endMinute);
 
+    const todo = {
+      title: newEventData.title,
+      description: newEventData.description,
+      start_time,
+      end_time,
+      deliverable: newEventData.deliverable,
+      space: null,
+    };
+
+    updateUserTodos(user.email, [ todo ]);
+
     setUserTodos((prev) => [
       ...prev,
-      {
-        title: newEventData.title,
-        description: newEventData.description,
-        start_time,
-        end_time,
-        deliverable: newEventData.deliverable,
-      },
+      todo,
     ]);
   };
 
@@ -58,25 +67,27 @@ export default function CalendarWeek({
     const [dueMonth, dueDay, dueYear] = newEventData.dueDate.split("/");
     const [dueHour, dueMinute] = newEventData.dueTime.split(":");
 
-    const due_date = new Date(dueYear, dueMonth - 1, dueDay, dueHour, dueMinute);
+    const due_date = new Date(
+      dueYear,
+      dueMonth - 1,
+      dueDay,
+      dueHour,
+      dueMinute
+    );
 
-    setUserDeliverables((prev) => [
-      ...prev,
-      {
-        title: newEventData.title,
-        description: newEventData.description,
-        due_date,
-      },
-    ]);
-  }
+    const deliverable = {
+      title: newEventData.title,
+      description: newEventData.description,
+      due_date: due_date,
+      time_worked: 0,
+      space: null,
+      space_deliverable: null,
+    };
 
-  useEffect(() => {
-    setUserTodos(todos);
-  }, [todos]);
+    updateUserDeliverables(user.email, [ deliverable ]);
 
-  useEffect(() => {
-    setUserDeliverables(deliverables);
-  }, [deliverables]);
+    setUserDeliverables((prev) => [...prev, deliverable]);
+  };
 
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -122,19 +133,17 @@ export default function CalendarWeek({
                 setSelectedDay(day);
               }}
             >
-              {
-                showDeliverablePopup && eventPopupDay == index && (
-                  <NewDeliverableForm
-                    position={deliverablePopupPosition}
-                    initialDueDay={day}
-                    onSubmit={handleSaveNewDeliverable}
-                    onClose={() => {
-                      setShowDeliverablePopup(false);
-                      setClickedOutOfDeliverablePopup(true);
-                    }}
-                  />
-                )
-              }
+              {showDeliverablePopup && eventPopupDay == index && (
+                <NewDeliverableForm
+                  position={deliverablePopupPosition}
+                  initialDueDay={day}
+                  onSubmit={handleSaveNewDeliverable}
+                  onClose={() => {
+                    setShowDeliverablePopup(false);
+                    setClickedOutOfDeliverablePopup(true);
+                  }}
+                />
+              )}
               <h1 className="number-date">{format(day, "MM/dd")}</h1>
               <h1 className="weekday">{format(day, "EEE")}</h1>
               <div className="dots-wrapper">
