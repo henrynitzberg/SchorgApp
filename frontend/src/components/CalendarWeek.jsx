@@ -88,6 +88,7 @@ export default function CalendarWeek({
 
   const handleRemoveToDo = (e, eventData) => {
     e.preventDefault();
+    console.log(eventData);
     removeTodos(user.email, [eventData]);
     setUserTodos((prev) => prev.filter((todo) => todo !== eventData));
   };

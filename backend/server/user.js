@@ -142,16 +142,27 @@ async function removeTodos(email, todos) {
         const db = client.db("Gage");
         const users = db.collection("Users");
 
+        console.log(todos);
+
+        const todo_ids = todos.map((todo) => {
+            return ObjectId.createFromHexString(todo._id);
+        });
+
+        console.log(todo_ids);
+
         await users.updateOne(
             { email: email },
             { $pull: {
                 todos: {
-                    $in: todos
+                    _id: {
+                        $in: todo_ids
+                    }
                 }
-            } }
+            }}
         );
     }
     catch (err) {
+        console.error(err);
         throw err;
     }
 }

@@ -39,9 +39,10 @@ export async function updateTodos(email, todos) {
 
 export async function removeTodos(email, todos) {
     try {
+        console.log("removing todos: ", todos);
         await axios.put(APP_URL + "/user/remove-todos", {
             email: email,
-            todos: todos
+            removed_todos: todos
         });
     } catch (err) {
         throw err;
