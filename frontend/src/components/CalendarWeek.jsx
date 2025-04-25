@@ -17,6 +17,8 @@ export default function CalendarWeek({
   setUserTodos,
   userDeliverables,
   setUserDeliverables,
+  userSpaces,
+  setUserSpaces,
 }) {
   const [showToDoPopup, setShowToDoPopup] = useState(false);
   const [showDeliverablePopup, setShowDeliverablePopup] = useState(false);
@@ -153,6 +155,12 @@ export default function CalendarWeek({
               <div className="dots-wrapper">
                 {/* add deadlines */}
                 {userDeliverables
+                  .filter((todo) => {
+                    const matchingSpace = userSpaces.find(
+                      (space) => space._id === todo.space
+                    );
+                    return matchingSpace ? matchingSpace.shown !== false : true;
+                  })
                   .filter(
                     (event) =>
                       format(event.due_date, "yyyy-MM-dd") ===
@@ -261,6 +269,12 @@ export default function CalendarWeek({
 
             {/* add events */}
             {userTodos
+              .filter((todo) => {
+                const matchingSpace = userSpaces.find(
+                  (space) => space._id === todo.space
+                );
+                return matchingSpace ? matchingSpace.shown !== false : true;
+              })
               .filter(
                 (event) =>
                   format(event.start_time, "yyyy-MM-dd") ===

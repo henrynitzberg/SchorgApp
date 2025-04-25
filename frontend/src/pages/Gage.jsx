@@ -77,6 +77,8 @@ export default function Gage() {
             setUserTodos={setUserTodos}
             userDeliverables={userDeliverables}
             setUserDeliverables={setUserDeliverables}
+            userSpaces={userSpaces}
+            setUserSpaces={setUserSpaces}
           />
         )}
         {view === "space" && <SelectedSpace space={selectedSpaceInfo} />}
