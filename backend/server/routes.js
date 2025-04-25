@@ -207,7 +207,28 @@ app.put("/user/update-deliverables", async (req, res) => {
         });
     }
     catch (err) {
-        return res.status(400).json({ message: "Failed to update deliverables." })
+        return res.status(400).json({
+            message: "Failed to update deliverables."
+        })
+    }
+})
+
+app.put("/user/toggle-space-display", async (req, res) => {
+    const email = req.body.email;
+    const spaceId = req.body.spaceId;
+    const shown = req.body.shown;
+
+    try {
+        await user.toggleSpaceDisplay(email, spaceId, shown);
+
+        return res.status(200).json({
+            message: "Successfully updated space display setting."
+        });
+    }
+    catch (err) {
+        return res.status(400).json({
+            message: "Failed to update space display setting."
+        })
     }
 })
 
@@ -215,7 +236,7 @@ app.put("/user/update-spaces", async (req, res) => {
     const email = req.body.email;
     const newSpaces = req.body.new_spaces;
     try {
-        await user.writeSpaces(email, newSpaces);
+        await user.writeSpaces(email, newSpaces, shown);
 
         return res.status(200).json({
             message: "Successfully updated user spaces."

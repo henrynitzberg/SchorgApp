@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 
 import {
+  fetchSpaceData,
   updateUserDeliverables,
   updateSpacePeople,
   updateUserSpaces,
@@ -14,42 +15,47 @@ export default function AddSpacePopUp({
   setUserTodos,
   userDeliverables,
   setUserDeliverables,
-  setAddSpacePopUp,
+  setShowSpacePopUp,
   userSpaces,
   setUserSpaces,
   user,
 }) {
   const [enteredToken, setEnteredToken] = useState("");
-  const APP_URL = "http://localhost:8000";
+  const [errorMessage, setErrorMessage] = useState("");
+
+  function getSpaceDeliverables(space) {
+    const spaceDeliverables = space.data.space_deliverables;
+    const newDeliverables = [];
+    for (const deliverable of spaceDeliverables) {
+      newDeliverables.push({
+        title: deliverable.title,
+        description: deliverable.description,
+        due_date: deliverable.due_date,
+        time_worked: 0,
+        space: space.data._id,
+        space_deliverable: deliverable._id,
+      });
+    }
+
+    return newDeliverables;
+  }
 
   async function submitAccessToken(e) {
     e.preventDefault();
     try {
-      const space = await axios.post(APP_URL + "/space/info", {
-        access_code: enteredToken,
-      });
+      const space = await fetchSpaceData(enteredToken);
 
       for (const userSpace of userSpaces) {
         if (space.data._id === userSpace._id) {
-          alert("You're already registered for this class.");
+          setErrorMessage("You're already registered for this class.");
           return;
         }
       }
 
-      setUserSpaces([...userSpaces, space.data]);
-      const spaceDeliverables = space.data.space_deliverables;
-      const newDeliverables = [];
-      for (const deliverable of spaceDeliverables) {
-        newDeliverables.push({
-          title: deliverable.title,
-          description: deliverable.description,
-          due_date: deliverable.due_date,
-          time_worked: 0,
-          space: space.data._id,
-          space_deliverable: deliverable._id,
-        });
-      }
+      const newDeliverables = getSpaceDeliverables(space);
       setUserDeliverables([...userDeliverables, ...newDeliverables]);
+      setUserSpaces([...userSpaces, space.data]);
+
       updateUserDeliverables(user.email, newDeliverables);
       updateSpacePeople(space.data._id, [
         {
@@ -62,14 +68,15 @@ export default function AddSpacePopUp({
         {
           _id: space.data._id,
           name: space.data.name,
+          shown: true,
         },
       ]);
     } catch (err) {
       console.error(err);
-      alert("Invalid space token");
+      setErrorMessage("Invalid space token");
     } finally {
       setEnteredToken("");
-      setAddSpacePopUp(false);
+      // setAddSpacePopUp(false);
     }
   }
 
@@ -86,11 +93,21 @@ export default function AddSpacePopUp({
         value={enteredToken}
         onChange={(e) => setEnteredToken(e.target.value)}
       />
+      {errorMessage.length > 0 && (
+        <p className="error-message">{errorMessage}</p>
+      )}
       <button
         className="add-space-confirm"
         onClick={(e) => submitAccessToken(e)}
       >
         Confirm
+      </button>
+
+      <button
+        className="add-space-close-button"
+        onClick={() => setShowSpacePopUp(false)}
+      >
+        X
       </button>
     </form>
   );
