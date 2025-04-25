@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import AddSpacePopUp from "./AddSpacePopUp.jsx";
+import { toggleSpaceDisplay } from "../crud.js";
 
 import "../css/Sidebar.css";
 
@@ -23,40 +24,22 @@ export default function Sidebar({
     setAllTasks([...userTodos, ...userDeliverables]);
   }, [userTodos, userDeliverables]);
 
-  // useEffect(() => {
-  //   setUserSpaces(userSpaces);
-  //   setShownSpaces([...shownSpaces, true]);
-  // }, [userSpaces]);
-
-  // useEffect(() => {
-  //   setShownSpaces((prev) => {
-  //     const newLength = userSpaces.length;
-  //     const prevLength = prev.length;
-
-  //     if (newLength > prevLength) {
-  //       // Add `true` for each new space
-  //       const added = Array(newLength - prevLength).fill(true);
-  //       return [...prev, ...added];
-  //     } else {
-  //       // If userSpaces shrank or stayed the same, just trim or return prev
-  //       return prev.slice(0, newLength);
-  //     }
-  //   });
-  // }, [userSpaces]);
-
-  // const spaches = [{ name: "CS daj adiow adi awid fweifhweo" }];
-
-  function toggleSpaceDeliverables(i) {
+  async function toggleSpaceDeliverables(i) {
     setUserSpaces((prev) => {
       const updated = [...prev];
       updated[i] = { ...updated[i], shown: !updated[i].shown };
       return updated;
     });
 
-    console.log(userSpaces);
+    const userSpace = userSpaces[i];
+    try {
+      await toggleSpaceDisplay(user.email, userSpace._id, !userSpace.shown);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  // function showSpaceDeliverables(i, spaceId) {}
+  console.log(userSpaces);
 
   return (
     <div className="sidebar-wrapper">
@@ -100,9 +83,10 @@ export default function Sidebar({
 
               <button
                 className="hide-space-button"
-                onClick={() => toggleSpaceDeliverables(i, space._id)}
+                onClick={async () =>
+                  await toggleSpaceDeliverables(i, space._id)
+                }
               >
-                {console.log(space)}
                 <img
                   src={space.shown ? "/hide.svg" : "/eye.svg"}
                   alt="Hide space icon"
@@ -114,7 +98,7 @@ export default function Sidebar({
           <div className="add-space">
             <button
               className="add-space-button"
-              onClick={() => setShowSpacePopUp(!showSpacePopUp)}
+              onClick={() => setShowSpacePopUp(true)}
             >
               + add space
             </button>
@@ -122,7 +106,7 @@ export default function Sidebar({
         </div>
         {showSpacePopUp && (
           <AddSpacePopUp
-            setAddSpacePopUp={setShowSpacePopUp}
+            setShowSpacePopUp={setShowSpacePopUp}
             userDeliverables={userDeliverables}
             setUserDeliverables={setUserDeliverables}
             userSpaces={userSpaces}

@@ -15,6 +15,31 @@ export async function fetchUserData(email) {
     }
 }
 
+export async function fetchSpaceData(accessCode) {
+    try {
+        const space = await axios.post(APP_URL + "/space/info", {
+            access_code: accessCode,
+        });
+
+        return space;
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+export async function toggleSpaceDisplay(email, spaceId, shown) {
+    try {
+        await axios.put(APP_URL + "/user/toggle-space-display", {
+            email: email,
+            spaceId: spaceId,
+            shown: shown
+        });
+    } catch (err) {
+        throw err;
+    }
+}
+
 export async function updateUserDeliverables(email, deliverables) {
     try {
         await axios.put(APP_URL + "/user/update-deliverables", {
@@ -53,7 +78,7 @@ export async function updateUserSpaces(email, spaces) {
     try {
         await axios.put(APP_URL + "/user/update-spaces", {
             email: email,
-            new_spaces: spaces
+            new_spaces: spaces,
         })
     } catch (err) {
         throw err;

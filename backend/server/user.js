@@ -1,6 +1,7 @@
 const { MongoClient } = require("mongodb");
 const ObjectId = require("mongodb").ObjectId;
 const bcrypt = require("bcrypt");
+const space = require("./space");
 
 const dotenv = require("dotenv").config();
 const mongo_uri = process.env.MONGO_URI;
@@ -73,6 +74,30 @@ async function registerUserGoogle(first_name, last_name, email) {
         });
 
         return await getUser(email);
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+async function toggleSpaceDisplay(email, spaceId, shown) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        await users.updateOne(
+            { 
+                email: email, 
+                "user_spaces._id": ObjectId.createFromHexString(spaceId) 
+            },
+            { 
+                $set: { 
+                    "user_spaces.$.shown": shown 
+                } 
+            }
+        );
     }
     catch (err) {
         throw err;
@@ -175,6 +200,8 @@ async function writeSpaces(email, spaces) {
                 }
             } }
         );
+
+        console.log("it")
     }
     catch (err) {
         throw err;
@@ -188,5 +215,6 @@ module.exports = {
     writeDeliverables: writeDeliverables,
     writeTodos: writeTodos,
     removeTodos: removeTodos,
-    writeSpaces: writeSpaces
+    writeSpaces: writeSpaces,
+    toggleSpaceDisplay: toggleSpaceDisplay
 }

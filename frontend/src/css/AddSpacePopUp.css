@@ -30,6 +30,12 @@
     border-bottom: 1px solid var(--gray);
 }
 
+.error-message {
+    font-size: 11px;
+    color: var(--red);
+    text-align: center;
+}
+
 .add-space-confirm {
     background-color: var(--gray);
     font-size: 14px;
@@ -37,4 +43,13 @@
     border-radius: 5px;
     width: 50%;
     place-self: end;
+}
+
+.add-space-close-button {
+    position: absolute;
+    top: 0.5em;
+    right: 0.75em;
+    font-size: 14px;
+    background-color: transparent;
+    border-radius: 0.5px;
 }
