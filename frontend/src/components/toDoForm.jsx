@@ -45,6 +45,68 @@ export default function ToDoForm({
     }, 3000);
   };
 
+  const handleNewSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+
+    const title = form.title.value;
+    if (!title || title.length === 0) {
+      setTitleErrorMessage("Please enter a title.");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    const description = form.description.value;
+
+    const startTime = form.startTime.value;
+    const endTime = form.endTime.value;
+    if (!startTime || !endTime) {
+      setTimeErrorMessage("Please enter a start and end time.");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    const startHour = parseInt(startTime.split(":")[0]);
+    const startMinute = parseInt(startTime.split(":")[1]);
+    const endHour = parseInt(endTime.split(":")[0]);
+    const endMinute = parseInt(endTime.split(":")[1]);
+
+    // Check if start time is before end time
+    if (
+      startHour > endHour ||
+      (startHour === endHour && startMinute >= endMinute)
+    ) {
+      setTimeErrorMessage("Start time must be before end time.");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    if (
+      startHour < 0 ||
+      startHour > 23 ||
+      startMinute < 0 ||
+      startMinute > 59
+    ) {
+      setTimeErrorMessage("Please enter a valid start time.");
+      clearErrorAfterDelay();
+      return;
+    }
+    if (endHour < 0 || endHour > 23 || endMinute < 0 || endMinute > 59) {
+      setTimeErrorMessage("Please enter a valid end time.");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    const deliverableTitle = form.deliverable.value;
+    const deliverable = deliverables.find(
+      (deliverable) => deliverable.title === deliverableTitle
+    );
+
+    onSave({ title, description, startTime, endTime, deliverable });
+    onClose();
+  };
+  const handleEditSubmit = (e) => { onClose()};
+
   return (
     <div
       ref={popupRef}
@@ -65,66 +127,7 @@ export default function ToDoForm({
         x
       </div>
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const form = e.target;
-
-          const title = form.title.value;
-          if (!title || title.length === 0) {
-            setTitleErrorMessage("Please enter a title.");
-            clearErrorAfterDelay();
-            return;
-          }
-
-          const description = form.description.value;
-
-          const startTime = form.startTime.value;
-          const endTime = form.endTime.value;
-          if (!startTime || !endTime) {
-            setTimeErrorMessage("Please enter a start and end time.");
-            clearErrorAfterDelay();
-            return;
-          }
-
-          const startHour = parseInt(startTime.split(":")[0]);
-          const startMinute = parseInt(startTime.split(":")[1]);
-          const endHour = parseInt(endTime.split(":")[0]);
-          const endMinute = parseInt(endTime.split(":")[1]);
-
-          // Check if start time is before end time
-          if (
-            startHour > endHour ||
-            (startHour === endHour && startMinute >= endMinute)
-          ) {
-            setTimeErrorMessage("Start time must be before end time.");
-            clearErrorAfterDelay();
-            return;
-          }
-
-          if (
-            startHour < 0 ||
-            startHour > 23 ||
-            startMinute < 0 ||
-            startMinute > 59
-          ) {
-            setTimeErrorMessage("Please enter a valid start time.");
-            clearErrorAfterDelay();
-            return;
-          }
-          if (endHour < 0 || endHour > 23 || endMinute < 0 || endMinute > 59) {
-            setTimeErrorMessage("Please enter a valid end time.");
-            clearErrorAfterDelay();
-            return;
-          }
-
-          const deliverableTitle = form.deliverable.value;
-          const deliverable = deliverables.find(
-            (deliverable) => deliverable.title === deliverableTitle
-          );
-
-          onSave({ title, description, startTime, endTime, deliverable });
-          onClose();
-        }}
+        onSubmit={editMode ? handleEditSubmit : handleNewSubmit}
       >
         <div className="todo-popup-title"> New ToDo </div>
         <div>

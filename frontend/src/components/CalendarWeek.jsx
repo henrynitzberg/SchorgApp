@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format, set } from "date-fns";
+import { ObjectId } from "bson";
 import ToDoForm from "./toDoForm.jsx";
 import { updateUserDeliverables, updateTodos, removeTodos } from "../crud.js";
 
@@ -29,6 +30,7 @@ export default function CalendarWeek({
     y: 0,
   });
   const [eventPopupDay, setEventPopupDay] = useState(-1);
+  const [todoEditMode, setTodoEditMode] = useState(false); // For editing todo
 
   const [selectedDay, setSelectedDay] = useState(null); // For assigning event to day
   const [initialStartTime, setInitialStartTime] = useState("00:00"); // optional
@@ -54,6 +56,7 @@ export default function CalendarWeek({
       time_worked: 0,
       space: null,
       space_deliverable: null,
+      _id: new ObjectId(),
     };
 
     updateUserDeliverables(user.email, [deliverable]);
@@ -79,6 +82,7 @@ export default function CalendarWeek({
       end_time,
       deliverable: newEventData.deliverable,
       space: null,
+      _id: new ObjectId(),
     };
 
     updateTodos(user.email, [todo]);
@@ -89,8 +93,8 @@ export default function CalendarWeek({
   const handleRemoveToDo = (e, eventData) => {
     e.preventDefault();
     console.log(eventData);
-    removeTodos(user.email, [eventData]);
-    setUserTodos((prev) => prev.filter((todo) => todo !== eventData));
+    // removeTodos(user.email, [eventData]);
+    // setUserTodos((prev) => prev.filter((todo) => todo !== eventData));
   };
 
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
@@ -221,6 +225,7 @@ export default function CalendarWeek({
                 setInitialEndTime(formattedEndTime);
               }
               setSelectedDay(day);
+              setTodoEditMode(false);
             }}
           >
             {showToDoPopup && eventPopupDay == index && (
@@ -234,7 +239,7 @@ export default function CalendarWeek({
                   setClickedOutOfToDoPopup(true);
                 }}
                 onSave={handleSaveNewToDo}
-                editMode={false}
+                editMode={todoEditMode}
               />
             )}
 
@@ -284,7 +289,22 @@ export default function CalendarWeek({
                       height: `${height}px`,
                     }}
                     onContextMenu={(e) => {
-                      handleRemoveToDo(e, event);
+                      e.preventDefault();
+                      if (showToDoPopup || clickedOutOfToDoPopup) {
+                        setClickedOutOfToDoPopup(false);
+                        return;
+                      }
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const x = e.clientX - rect.left;
+                      const y = e.clientY - rect.top;
+                      setEventPopupDay(index);
+                      setToDoPopupPosition({ x, y });
+                      setShowToDoPopup(true);
+        
+                      setInitialStartTime("hi");
+                      setInitialEndTime("hi");
+                      setSelectedDay(day);
+                      setTodoEditMode(false);
                     }}
                   >
                     <h1 className="calendar-event-title"> {event.title} </h1>
