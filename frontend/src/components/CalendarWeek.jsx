@@ -22,8 +22,11 @@ export default function CalendarWeek({
   setUserSpaces,
 }) {
   const [showToDoPopup, setShowToDoPopup] = useState(false);
+  const [showEditToDoPopup, setShowEditToDoPopup] = useState(false);
   const [showDeliverablePopup, setShowDeliverablePopup] = useState(false);
   const [clickedOutOfToDoPopup, setClickedOutOfToDoPopup] = useState(false);
+  const [clickedOutOfEditToDoPopup, setClickedOutOfEditToDoPopup] =
+    useState(false);
   const [clickedOutOfDeliverablePopup, setClickedOutOfDeliverablePopup] =
     useState(false);
   const [toDoPopupPosition, setToDoPopupPosition] = useState({ x: 0, y: 0 });
@@ -32,7 +35,7 @@ export default function CalendarWeek({
     y: 0,
   });
   const [eventPopupDay, setEventPopupDay] = useState(-1);
-  const [todoEditMode, setTodoEditMode] = useState(false); // For editing todo
+  const [selectedToDo, setSelectedToDo] = useState(null); // For editing todo
 
   const [selectedDay, setSelectedDay] = useState(null); // For assigning event to day
   const [initialStartTime, setInitialStartTime] = useState("00:00"); // optional
@@ -93,10 +96,10 @@ export default function CalendarWeek({
   };
 
   const handleRemoveToDo = (e, eventData) => {
-    e.preventDefault();
-    console.log(eventData);
-    // removeTodos(user.email, [eventData]);
-    // setUserTodos((prev) => prev.filter((todo) => todo !== eventData));
+    // e.preventDefault();
+    // console.log(eventData);
+    removeTodos(user.email, [eventData]);
+    setUserTodos((prev) => prev.filter((todo) => todo !== eventData));
   };
 
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
@@ -131,9 +134,11 @@ export default function CalendarWeek({
               key={index}
               onClick={(e) => {
                 if (showDeliverablePopup || clickedOutOfDeliverablePopup) {
+                  setShowDeliverablePopup(false);
                   setClickedOutOfDeliverablePopup(false);
                   return;
                 }
+                setShowEditToDoPopup(false);
                 const rect = e.currentTarget.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
@@ -204,10 +209,14 @@ export default function CalendarWeek({
             key={index}
             className="calendar-week-day-body"
             onClick={(e) => {
-              if (showToDoPopup || clickedOutOfToDoPopup) {
+              if (showToDoPopup || clickedOutOfToDoPopup || showEditToDoPopup || clickedOutOfEditToDoPopup) {
+                setShowEditToDoPopup(false);
                 setClickedOutOfToDoPopup(false);
+                setClickedOutOfEditToDoPopup(false);
+                setShowEditToDoPopup(false);
                 return;
               }
+              setShowEditToDoPopup(false);
               const rect = e.currentTarget.getBoundingClientRect();
               const x = e.clientX - rect.left;
               const y = e.clientY - rect.top;
@@ -233,7 +242,6 @@ export default function CalendarWeek({
                 setInitialEndTime(formattedEndTime);
               }
               setSelectedDay(day);
-              setTodoEditMode(false);
             }}
           >
             {showToDoPopup && eventPopupDay == index && (
@@ -247,7 +255,7 @@ export default function CalendarWeek({
                   setClickedOutOfToDoPopup(true);
                 }}
                 onSave={handleSaveNewToDo}
-                editMode={todoEditMode}
+                editMode={false}
               />
             )}
 
@@ -303,22 +311,24 @@ export default function CalendarWeek({
                       height: `${height}px`,
                     }}
                     onContextMenu={(e) => {
-                      e.preventDefault();
-                      if (showToDoPopup || clickedOutOfToDoPopup) {
+                      if (
+                        showToDoPopup ||
+                        clickedOutOfToDoPopup ||
+                        showEditToDoPopup
+                      ) {
+                        setShowToDoPopup(false);
                         setClickedOutOfToDoPopup(false);
+                        setShowEditToDoPopup(false);
                         return;
                       }
+                      e.preventDefault();
                       const rect = e.currentTarget.getBoundingClientRect();
                       const x = e.clientX - rect.left;
                       const y = e.clientY - rect.top;
-                      setEventPopupDay(index);
+                      setSelectedToDo(event._id);
                       setToDoPopupPosition({ x, y });
-                      setShowToDoPopup(true);
-        
-                      setInitialStartTime("hi");
-                      setInitialEndTime("hi");
+                      setShowEditToDoPopup(true);
                       setSelectedDay(day);
-                      setTodoEditMode(false);
                     }}
                   >
                     <h1 className="calendar-event-title"> {event.title} </h1>
@@ -326,6 +336,24 @@ export default function CalendarWeek({
                       {format(event.start_time, "hh:mm")}-
                       {format(event.end_time, "hh:mm")}
                     </h1>
+
+                    {/* {showEditToDoPopup && ( */}
+                    {showEditToDoPopup && selectedToDo === event._id && (
+                      <ToDoForm
+                        position={toDoPopupPosition}
+                        initialStartTime={""}
+                        initialEndTime={""}
+                        deliverables={userDeliverables}
+                        onClose={() => {
+                          setShowEditToDoPopup(false);
+                          setClickedOutOfEditToDoPopup(true);
+                        }}
+                        onSave={handleSaveNewToDo}
+                        editMode={true}
+                        eventData={event}
+                        handleRemoveTodo={handleRemoveToDo}
+                      />
+                    )}
                   </div>
                 );
               })}

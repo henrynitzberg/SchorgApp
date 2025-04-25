@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { format } from "date-fns";
 import "../css/toDoForm.css";
 
 export default function ToDoForm({
@@ -9,8 +10,13 @@ export default function ToDoForm({
   onClose,
   onSave,
   editMode,
+  eventData = null,
+  handleRemoveTodo = null,
 }) {
   const popupRef = useRef(null);
+
+  const startTime = editMode ? format(eventData.start_time, "HH:mm") : initialStartTime;
+  const endTime = editMode ? format(eventData.end_time, "HH:mm") : initialEndTime;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -129,12 +135,13 @@ export default function ToDoForm({
       <form
         onSubmit={editMode ? handleEditSubmit : handleNewSubmit}
       >
-        <div className="todo-popup-title"> New ToDo </div>
+        <div className="todo-popup-title"> {editMode ? "Edit ToDo" : "New ToDo"} </div>
         <div>
           <input
             name="title"
             type="text"
             placeholder="Title"
+            defaultValue={editMode ? eventData.title : ""}
             className="title-input"
           />
         </div>
@@ -146,11 +153,12 @@ export default function ToDoForm({
             type="text"
             placeholder="Description"
             className="description-input"
+            defaultValue={editMode ? eventData.description : ""}
             ref={descriptionRef}
             onInput={handleInput}
           />
         </div>
-
+        
         <h1 className="todo-popup-subtitle">Duration</h1>
         <div className="todo-popup-duration-wrapper">
           <div>
@@ -158,7 +166,7 @@ export default function ToDoForm({
               name="startTime"
               type="text"
               placeholder="start"
-              defaultValue={initialStartTime}
+              defaultValue={startTime}
               className="time-input"
             />
           </div>
@@ -168,7 +176,7 @@ export default function ToDoForm({
               name="endTime"
               type="text"
               placeholder="end"
-              defaultValue={initialEndTime}
+              defaultValue={endTime}
               className="time-input"
             />
           </div>
@@ -177,7 +185,7 @@ export default function ToDoForm({
 
         <h1 className="todo-popup-subtitle">Deliverable</h1>
         <div>
-          <select name="deliverable" className="deliverable-select">
+          <select name="deliverable" className="deliverable-select" >
             <option value="">(none)</option>
             {deliverables.map((deliverable, i) => (
               <option key={i} value={deliverable.title}>
