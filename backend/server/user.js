@@ -132,13 +132,6 @@ async function writeTodos(email, todos) {
         const db = client.db("Gage");
         const users = db.collection("Users");
 
-        // todos = todos.map((todo) => {
-        //     return {
-        //         ...todo,
-        //         _id: new ObjectId()
-        //     }
-        // });
-
         await users.updateOne(
             { email: email },
             { $push: {
@@ -163,10 +156,9 @@ async function removeTodos(email, todos) {
         console.log(todos);
 
         const todo_ids = todos.map((todo) => {
-            return ObjectId.createFromHexString(todo._id);
+            // the tostring will be REMOVED once all ids are created on back end
+            return ObjectId.createFromHexString(todo._id).toString();
         });
-
-        console.log(todo_ids);
 
         await users.updateOne(
             { email: email },
@@ -176,7 +168,7 @@ async function removeTodos(email, todos) {
                         $in: todo_ids
                     }
                 }
-            }}
+            } }
         );
     }
     catch (err) {

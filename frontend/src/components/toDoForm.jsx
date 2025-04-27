@@ -132,6 +132,22 @@ export default function ToDoForm({
       >
         x
       </div>
+
+      {/* Delete button */}
+      {editMode && ( <div
+        className="todo-popup-delete-button-wrapper"
+        onClick={(e) => {
+          handleRemoveTodo(eventData);
+          onClose();
+        }}
+      >
+        <img
+          src={"/trash-gray.svg"}
+          alt="delete todo icon"
+          className="delete-todo-icon"
+        />
+      </div>)}
+      
       <form
         onSubmit={editMode ? handleEditSubmit : handleNewSubmit}
       >
@@ -185,10 +201,10 @@ export default function ToDoForm({
 
         <h1 className="todo-popup-subtitle">Deliverable</h1>
         <div>
-          <select name="deliverable" className="deliverable-select" >
+          <select name="deliverable" className="deliverable-select" defaultValue={editMode && eventData.deliverable ? eventData.deliverable.title : ""} >
             <option value="">(none)</option>
             {deliverables.map((deliverable, i) => (
-              <option key={i} value={deliverable.title}>
+              <option key={i} value={deliverable.title} >
                 {deliverable.title}
               </option>
             ))}

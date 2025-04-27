@@ -95,9 +95,8 @@ export default function CalendarWeek({
     setUserTodos((prev) => [...prev, todo]);
   };
 
-  const handleRemoveToDo = (e, eventData) => {
-    // e.preventDefault();
-    // console.log(eventData);
+  const handleRemoveToDo = (e) => {
+    const eventData = e;
     removeTodos(user.email, [eventData]);
     setUserTodos((prev) => prev.filter((todo) => todo !== eventData));
   };
@@ -134,11 +133,9 @@ export default function CalendarWeek({
               key={index}
               onClick={(e) => {
                 if (showDeliverablePopup || clickedOutOfDeliverablePopup) {
-                  setShowDeliverablePopup(false);
                   setClickedOutOfDeliverablePopup(false);
                   return;
                 }
-                setShowEditToDoPopup(false);
                 const rect = e.currentTarget.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
@@ -209,14 +206,16 @@ export default function CalendarWeek({
             key={index}
             className="calendar-week-day-body"
             onClick={(e) => {
-              if (showToDoPopup || clickedOutOfToDoPopup || showEditToDoPopup || clickedOutOfEditToDoPopup) {
-                setShowEditToDoPopup(false);
+              if (
+                showToDoPopup ||
+                clickedOutOfToDoPopup ||
+                showEditToDoPopup ||
+                clickedOutOfEditToDoPopup
+              ) {
                 setClickedOutOfToDoPopup(false);
                 setClickedOutOfEditToDoPopup(false);
-                setShowEditToDoPopup(false);
                 return;
               }
-              setShowEditToDoPopup(false);
               const rect = e.currentTarget.getBoundingClientRect();
               const x = e.clientX - rect.left;
               const y = e.clientY - rect.top;
@@ -314,11 +313,11 @@ export default function CalendarWeek({
                       if (
                         showToDoPopup ||
                         clickedOutOfToDoPopup ||
-                        showEditToDoPopup
+                        showEditToDoPopup ||
+                        clickedOutOfEditToDoPopup
                       ) {
-                        setShowToDoPopup(false);
                         setClickedOutOfToDoPopup(false);
-                        setShowEditToDoPopup(false);
+                        setClickedOutOfEditToDoPopup(false);
                         return;
                       }
                       e.preventDefault();

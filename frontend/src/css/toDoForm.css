@@ -16,6 +16,7 @@
     z-index: 100;
 
     user-select: none;
+    cursor: default;
 }
 
 .todo-popup-X-button-wrapper {
@@ -32,7 +33,43 @@
     
     border: 1px solid var(--text-gray);
     cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+.todo-popup-X-button-wrapper:hover {
+  transition: background-color 0.2s ease, color 0.2s ease;
+  color: white;
+  border: 1px solid white;
+}
+
+.delete-todo-icon {
+    margin-top: .15em;
+    width: 17px;
+    height: 16px;
+}
+
+.todo-popup-delete-button-wrapper {
+    fill: var(--text-gray);
+
+    position: absolute;
+    top: 0.25em;
+    left: 0.25em;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: .5em;
+    text-align: center;
+    align-items: center;
+    color: var(--text-gray);
+    
+    border: 1px solid var(--text-gray);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.todo-popup-delete-button-wrapper:hover {
+    background-color: darkred;
+    border: 1px solid white;
+  }
 
 .todo-popup-title {
     font-size: 1.2em;
@@ -144,5 +181,11 @@
     
     border: 1px solid var(--text-gray);
     cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.todo-popup-button:hover {
+  color: white;
+  border: 1px solid white;
 }
 
