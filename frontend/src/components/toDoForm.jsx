@@ -9,14 +9,19 @@ export default function ToDoForm({
   deliverables,
   onClose,
   onSave,
+  onEdit,
   editMode,
   eventData = null,
   handleRemoveTodo = null,
 }) {
   const popupRef = useRef(null);
 
-  const startTime = editMode ? format(eventData.start_time, "HH:mm") : initialStartTime;
-  const endTime = editMode ? format(eventData.end_time, "HH:mm") : initialEndTime;
+  const startTime = editMode
+    ? format(eventData.start_time, "HH:mm")
+    : initialStartTime;
+  const endTime = editMode
+    ? format(eventData.end_time, "HH:mm")
+    : initialEndTime;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -111,7 +116,66 @@ export default function ToDoForm({
     onSave({ title, description, startTime, endTime, deliverable });
     onClose();
   };
-  const handleEditSubmit = (e) => { onClose()};
+  const handleEditSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+
+    const title = form.title.value;
+    if (!title || title.length === 0) {
+      setTitleErrorMessage("Please enter a title.");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    const description = form.description.value;
+
+    const startTime = form.startTime.value;
+    const endTime = form.endTime.value;
+    if (!startTime || !endTime) {
+      setTimeErrorMessage("Please enter a start and end time.");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    const startHour = parseInt(startTime.split(":")[0]);
+    const startMinute = parseInt(startTime.split(":")[1]);
+    const endHour = parseInt(endTime.split(":")[0]);
+    const endMinute = parseInt(endTime.split(":")[1]);
+
+    // Check if start time is before end time
+    if (
+      startHour > endHour ||
+      (startHour === endHour && startMinute >= endMinute)
+    ) {
+      setTimeErrorMessage("Start time must be before end time.");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    if (
+      startHour < 0 ||
+      startHour > 23 ||
+      startMinute < 0 ||
+      startMinute > 59
+    ) {
+      setTimeErrorMessage("Please enter a valid start time.");
+      clearErrorAfterDelay();
+      return;
+    }
+    if (endHour < 0 || endHour > 23 || endMinute < 0 || endMinute > 59) {
+      setTimeErrorMessage("Please enter a valid end time.");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    const deliverableTitle = form.deliverable.value;
+    const deliverable = deliverables.find(
+      (deliverable) => deliverable.title === deliverableTitle
+    );
+
+    onEdit({ title, description, startTime, endTime, deliverable }, eventData._id);
+    onClose();
+  };
 
   return (
     <div
@@ -134,24 +198,27 @@ export default function ToDoForm({
       </div>
 
       {/* Delete button */}
-      {editMode && ( <div
-        className="todo-popup-delete-button-wrapper"
-        onClick={(e) => {
-          handleRemoveTodo(eventData);
-          onClose();
-        }}
-      >
-        <img
-          src={"/trash-gray.svg"}
-          alt="delete todo icon"
-          className="delete-todo-icon"
-        />
-      </div>)}
-      
-      <form
-        onSubmit={editMode ? handleEditSubmit : handleNewSubmit}
-      >
-        <div className="todo-popup-title"> {editMode ? "Edit ToDo" : "New ToDo"} </div>
+      {editMode && (
+        <div
+          className="todo-popup-delete-button-wrapper"
+          onClick={(e) => {
+            handleRemoveTodo(eventData);
+            onClose();
+          }}
+        >
+          <img
+            src={"/trash-gray.svg"}
+            alt="delete todo icon"
+            className="delete-todo-icon"
+          />
+        </div>
+      )}
+
+      <form onSubmit={editMode ? handleEditSubmit : handleNewSubmit}>
+        <div className="todo-popup-title">
+          {" "}
+          {editMode ? "Edit ToDo" : "New ToDo"}{" "}
+        </div>
         <div>
           <input
             name="title"
@@ -174,7 +241,7 @@ export default function ToDoForm({
             onInput={handleInput}
           />
         </div>
-        
+
         <h1 className="todo-popup-subtitle">Duration</h1>
         <div className="todo-popup-duration-wrapper">
           <div>
@@ -201,10 +268,18 @@ export default function ToDoForm({
 
         <h1 className="todo-popup-subtitle">Deliverable</h1>
         <div>
-          <select name="deliverable" className="deliverable-select" defaultValue={editMode && eventData.deliverable ? eventData.deliverable.title : ""} >
+          <select
+            name="deliverable"
+            className="deliverable-select"
+            defaultValue={
+              editMode && eventData.deliverable
+                ? eventData.deliverable.title
+                : ""
+            }
+          >
             <option value="">(none)</option>
             {deliverables.map((deliverable, i) => (
-              <option key={i} value={deliverable.title} >
+              <option key={i} value={deliverable.title}>
                 {deliverable.title}
               </option>
             ))}

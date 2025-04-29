@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format, set } from "date-fns";
 import { ObjectId } from "bson";
 import ToDoForm from "./toDoForm.jsx";
-import { updateUserDeliverables, updateTodos, removeTodos } from "../crud.js";
+import { updateUserDeliverables, updateTodos, removeTodos, editTodo } from "../crud.js";
 
 import "../css/CalendarWeek.css";
 import NewDeliverableForm from "./NewDeliverableForm";
@@ -95,10 +95,50 @@ export default function CalendarWeek({
     setUserTodos((prev) => [...prev, todo]);
   };
 
+  const handleEditToDo = (eventData, id) => {
+    const [startHour, startMinute] = eventData.startTime.split(":");
+    const [endHour, endMinute] = eventData.endTime.split(":");
+
+    const start_time = new Date(selectedDay);
+    start_time.setHours(startHour, startMinute);
+
+    const end_time = new Date(selectedDay);
+    end_time.setHours(endHour, endMinute);
+
+    const todo_edit = {
+      title: eventData.title,
+      description: eventData.description,
+      start_time,
+      end_time,
+      deliverable: eventData.deliverable,
+      space: null,
+      _id: id,
+    };
+
+    console.log("new version of old todo: ", todo_edit);
+
+    editTodo(user.email, todo_edit);
+    setUserTodos((prev) =>
+      prev.map((todo) => {
+        if (todo._id === id) {
+          return {
+            ...todo,
+            title: eventData.title,
+            description: eventData.description,
+            start_time,
+            end_time,
+            deliverable: eventData.deliverable,
+          };
+        }
+        return todo;
+      })
+    );
+  };
+
   const handleRemoveToDo = (e) => {
     const eventData = e;
     removeTodos(user.email, [eventData]);
-    setUserTodos((prev) => prev.filter((todo) => todo !== eventData));
+    setUserTodos((prev) => prev.filter((todo) => todo._id !== eventData._id));
   };
 
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
@@ -347,7 +387,8 @@ export default function CalendarWeek({
                           setShowEditToDoPopup(false);
                           setClickedOutOfEditToDoPopup(true);
                         }}
-                        onSave={handleSaveNewToDo}
+                        onSave={null}
+                        onEdit={handleEditToDo}
                         editMode={true}
                         eventData={event}
                         handleRemoveTodo={handleRemoveToDo}

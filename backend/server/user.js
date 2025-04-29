@@ -177,6 +177,29 @@ async function removeTodos(email, todos) {
     }
 }
 
+async function editTodo(email, todo) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        await users.updateOne(
+            { email: email, "todos._id": ObjectId.createFromHexString(todo._id).toString() },
+            { $set: {
+                "todos.$.title": todo.title,
+                "todos.$.description": todo.description,
+                "todos.$.start_time": todo.start_time,
+                "todos.$.end_time": todo.end_time,
+                "todos.$.deliverable": todo.deliverable
+            } }
+        );
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
 async function writeSpaces(email, spaces) {
     try {
         await client.connect();
@@ -207,6 +230,7 @@ module.exports = {
     writeDeliverables: writeDeliverables,
     writeTodos: writeTodos,
     removeTodos: removeTodos,
+    editTodo: editTodo,
     writeSpaces: writeSpaces,
     toggleSpaceDisplay: toggleSpaceDisplay
 }

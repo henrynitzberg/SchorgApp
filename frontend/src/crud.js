@@ -74,6 +74,18 @@ export async function removeTodos(email, todos) {
     }
 }
 
+export async function editTodo(email, todo) {
+    try {
+        console.log("editing todo: ", todo);
+        await axios.put(APP_URL + "/user/edit-todo", {
+            email: email,
+            todo: todo
+        });
+    } catch (err) {
+        throw err;
+    }
+}
+
 export async function updateUserSpaces(email, spaces) {
     try {
         await axios.put(APP_URL + "/user/update-spaces", {
