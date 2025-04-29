@@ -140,8 +140,6 @@ async function writeTodos(email, todos) {
             }
         });
 
-        console.log("todos from write:", todos);
-
         await users.updateOne(
             { email: email },
             { $push: {
@@ -168,10 +166,9 @@ async function removeTodos(email, todos) {
         console.log(todos);
 
         const todo_ids = todos.map((todo) => {
-            return ObjectId.createFromHexString(todo._id);
+            // the tostring will be REMOVED once all ids are created on back end
+            return ObjectId.createFromHexString(todo._id).toString();
         });
-
-        console.log(todo_ids);
 
         await users.updateOne(
             { email: email },
@@ -181,11 +178,34 @@ async function removeTodos(email, todos) {
                         $in: todo_ids
                     }
                 }
-            }}
+            } }
         );
     }
     catch (err) {
         console.error(err);
+        throw err;
+    }
+}
+
+async function editTodo(email, todo) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const users = db.collection("Users");
+
+        await users.updateOne(
+            { email: email, "todos._id": ObjectId.createFromHexString(todo._id).toString() },
+            { $set: {
+                "todos.$.title": todo.title,
+                "todos.$.description": todo.description,
+                "todos.$.start_time": todo.start_time,
+                "todos.$.end_time": todo.end_time,
+                "todos.$.deliverable": todo.deliverable
+            } }
+        );
+    }
+    catch (err) {
         throw err;
     }
 }
@@ -220,6 +240,7 @@ module.exports = {
     writeDeliverables: writeDeliverables,
     writeTodos: writeTodos,
     removeTodos: removeTodos,
+    editTodo: editTodo,
     writeSpaces: writeSpaces,
     toggleSpaceDisplay: toggleSpaceDisplay
 }

@@ -196,6 +196,22 @@ app.put("/user/remove-todos", async (req, res) => {
     }
 })
 
+app.put("/user/edit-todo", async (req, res) => {
+    const email = req.body.email;
+    const todo = req.body.todo;
+
+    try {
+        await user.editTodo(email, todo);
+        
+        return res.status(200).json({
+            message: "Successfully edited todo."
+        });
+    }
+    catch (err) {
+        return res.status(400).json({ message: "Failed to edit todo." })
+    }
+})
+
 app.put("/user/update-deliverables", async (req, res) => {
     const email = req.body.email;
     const newDeliverables = req.body.new_deliverables;
