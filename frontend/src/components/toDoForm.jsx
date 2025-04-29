@@ -173,7 +173,10 @@ export default function ToDoForm({
       (deliverable) => deliverable.title === deliverableTitle
     );
 
-    onEdit({ title, description, startTime, endTime, deliverable }, eventData._id);
+    onEdit(
+      { title, description, startTime, endTime, deliverable },
+      eventData._id
+    );
     onClose();
   };
 

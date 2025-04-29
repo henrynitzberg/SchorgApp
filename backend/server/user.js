@@ -132,11 +132,13 @@ async function writeTodos(email, todos) {
         const db = client.db("Gage");
         const users = db.collection("Users");
 
+        console.log("todos:", todos);
+
         todos = todos.map((todo) => {
             return {
                 ...todo,
                 _id: new ObjectId(),
-                deliverable: ObjectId.createFromHexString(todo.deliverable)
+                deliverable: todo.deliverable ? ObjectId.createFromHexString(todo.deliverable) : null
             }
         });
 

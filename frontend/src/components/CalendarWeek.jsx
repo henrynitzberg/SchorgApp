@@ -96,9 +96,13 @@ export default function CalendarWeek({
       description: newEventData.description,
       start_time,
       end_time,
-      deliverable: newEventData.deliverable._id,
+      deliverable: newEventData.deliverable
+        ? newEventData.deliverable._id
+        : null,
       space: null,
     };
+
+    console.log(todo);
     try {
       const newTodosWithId = await updateTodos(user.email, [todo]);
       console.log(newTodosWithId);

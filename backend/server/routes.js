@@ -167,6 +167,8 @@ app.put("/user/update-todos", async (req, res) => {
     const email = req.body.email;
     const newTodos = req.body.new_todos;
 
+    console.log("todos from routes:", newTodos);
+
     try {
         const newTodosWithId = await user.writeTodos(email, newTodos);
         
@@ -176,6 +178,7 @@ app.put("/user/update-todos", async (req, res) => {
         });
     }
     catch (err) {
+        console.error(err);
         return res.status(400).json({ message: "Failed to update todos." })
     }
 })
