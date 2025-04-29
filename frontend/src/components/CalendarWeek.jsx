@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format, set } from "date-fns";
-import { ObjectId } from "bson";
+// import { ObjectId } from "bson";
 import ToDoForm from "./toDoForm.jsx";
 import { updateUserDeliverables, updateTodos, removeTodos } from "../crud.js";
 
@@ -39,7 +39,7 @@ export default function CalendarWeek({
   const initialDuration = 1; // in hours
   const [initialEndTime, setInitialEndTime] = useState("00:00"); // optional
 
-  const handleSaveNewDeliverable = (newEventData) => {
+  const handleSaveNewDeliverable = async (newEventData) => {
     const [dueMonth, dueDay, dueYear] = newEventData.dueDate.split("/");
     const [dueHour, dueMinute] = newEventData.dueTime.split(":");
 
@@ -61,12 +61,18 @@ export default function CalendarWeek({
       _id: new ObjectId(),
     };
 
-    updateUserDeliverables(user.email, [deliverable]);
+    try {
+      const newDeliverablesWithId = await updateUserDeliverables(user.email, [
+        deliverable,
+      ]);
 
-    setUserDeliverables((prev) => [...prev, deliverable]);
+      setUserDeliverables((prev) => [...prev, ...newDeliverablesWithId]);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleSaveNewToDo = (newEventData) => {
+  const handleSaveNewToDo = async (newEventData) => {
     // Convert to full datetime using selectedDay
     const [startHour, startMinute] = newEventData.startTime.split(":");
     const [endHour, endMinute] = newEventData.endTime.split(":");
@@ -82,14 +88,18 @@ export default function CalendarWeek({
       description: newEventData.description,
       start_time,
       end_time,
-      deliverable: newEventData.deliverable,
+      deliverable: newEventData.deliverable._id,
       space: null,
-      _id: new ObjectId(),
     };
+    try {
+      const newTodosWithId = await updateTodos(user.email, [todo]);
+      console.log(newTodosWithId);
 
-    updateTodos(user.email, [todo]);
-
-    setUserTodos((prev) => [...prev, todo]);
+      setUserTodos((prev) => [...prev, ...newTodosWithId]);
+      console.log(userTodos);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleRemoveToDo = (e, eventData) => {
@@ -113,6 +123,9 @@ export default function CalendarWeek({
       scrollRef.current.scrollTop = scrollOffset;
     }
   }, []);
+
+  // console.log("user spaces:", userSpaces);
+  // console.log("user deliverables:", userDeliverables);
 
   return (
     <div className="calendar-week-wrapper">
@@ -163,6 +176,11 @@ export default function CalendarWeek({
                     const matchingSpace = userSpaces.find(
                       (space) => space._id === todo.space
                     );
+                    // console.log("curr deliv:", todo.title);
+                    // console.log(
+                    //   "does it match:",
+                    //   matchingSpace ? matchingSpace.shown !== false : true
+                    // );
                     return matchingSpace ? matchingSpace.shown !== false : true;
                   })
                   .filter(
@@ -275,9 +293,16 @@ export default function CalendarWeek({
             {/* add events */}
             {userTodos
               .filter((todo) => {
-                const matchingSpace = userSpaces.find(
-                  (space) => space._id === todo.space
+                const matchingDeliverable = userDeliverables.find(
+                  (deliverable) => deliverable._id === todo.deliverable
                 );
+
+                if (!matchingDeliverable) return true;
+
+                const matchingSpace = userSpaces.find(
+                  (space) => space._id === matchingDeliverable.space
+                );
+
                 return matchingSpace ? matchingSpace.shown !== false : true;
               })
               .filter(
@@ -314,7 +339,7 @@ export default function CalendarWeek({
                       setEventPopupDay(index);
                       setToDoPopupPosition({ x, y });
                       setShowToDoPopup(true);
-        
+
                       setInitialStartTime("hi");
                       setInitialEndTime("hi");
                       setSelectedDay(day);

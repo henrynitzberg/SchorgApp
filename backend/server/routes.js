@@ -168,10 +168,11 @@ app.put("/user/update-todos", async (req, res) => {
     const newTodos = req.body.new_todos;
 
     try {
-        await user.writeTodos(email, newTodos);
+        const newTodosWithId = await user.writeTodos(email, newTodos);
         
         return res.status(200).json({
-            message: "Successfully updated todos."
+            message: "Successfully updated todos.",
+            new_todos_with_id: newTodosWithId
         });
     }
     catch (err) {
@@ -200,10 +201,13 @@ app.put("/user/update-deliverables", async (req, res) => {
     const newDeliverables = req.body.new_deliverables;
 
     try {
-        await user.writeDeliverables(email, newDeliverables);
+        const newDeliverablesWithId = await user.writeDeliverables(
+            email, newDeliverables
+        );
         
         return res.status(200).json({
-            message: "Successfully updated user deliverables."
+            message: "Successfully updated user deliverables.",
+            new_deliverables_with_id: newDeliverablesWithId
         });
     }
     catch (err) {

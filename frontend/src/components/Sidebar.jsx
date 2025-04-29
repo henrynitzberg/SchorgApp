@@ -39,16 +39,27 @@ export default function Sidebar({
     }
   }
 
-  console.log(userSpaces);
-
   return (
     <div className="sidebar-wrapper">
       <div className="sidebar-top">
         <div className="sidebar-top-widget">
           {allTasks
-            .filter((todo) => {
+            .filter((task) => {
+              if ("deliverable" in task) {
+                const matchingDeliverable = userDeliverables.find(
+                  (d) => d._id === task.deliverable
+                );
+                if (!matchingDeliverable) return true;
+
+                const matchingSpace = userSpaces.find(
+                  (space) => space._id === matchingDeliverable.space
+                );
+                return matchingSpace ? matchingSpace.shown !== false : true;
+              }
+
+              // Else, it's a deliverable (has a space directly)
               const matchingSpace = userSpaces.find(
-                (space) => space._id === todo.space
+                (space) => space._id === task.space
               );
               return matchingSpace ? matchingSpace.shown !== false : true;
             })

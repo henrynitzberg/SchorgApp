@@ -88,6 +88,10 @@
     width: fit-content;
 }
 
+.space-selector:hover {
+    text-decoration: underline;
+}
+
 .dot {
     width: 12px;
     height: 10px;

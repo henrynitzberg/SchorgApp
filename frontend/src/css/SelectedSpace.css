@@ -1,0 +1,34 @@
+.selected-space-wrapper {
+    height: 100%;
+    padding: 1.5em;
+    background-color: var(--dark-gray);
+    border-radius: 10px;
+}
+
+.selected-space-header {
+    font-size: 24px;
+}
+
+.selected-space-header-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forum-nav-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5em;
+    align-items: center;
+    background-color: var(--gray);
+    padding: 0.5em;
+    border-radius: 5px;
+}
+
+.forum-nav-img {
+    filter: invert(1);
+    width: 20px;
+    height: 20px;
+}

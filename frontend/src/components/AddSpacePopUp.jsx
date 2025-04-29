@@ -56,15 +56,15 @@ export default function AddSpacePopUp({
       setUserDeliverables([...userDeliverables, ...newDeliverables]);
       setUserSpaces([...userSpaces, space.data]);
 
-      updateUserDeliverables(user.email, newDeliverables);
-      updateSpacePeople(space.data._id, [
+      await updateUserDeliverables(user.email, newDeliverables);
+      await updateSpacePeople(space.data._id, [
         {
           _id: user._id,
           first_name: user.first_name,
           last_name: user.last_name,
         },
       ]);
-      updateUserSpaces(user.email, [
+      await updateUserSpaces(user.email, [
         {
           _id: space.data._id,
           name: space.data.name,

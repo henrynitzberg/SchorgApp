@@ -1,0 +1,56 @@
+.spaces-view-wrapper {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--dark-gray);
+    padding: 1.5em;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    height: 100%;
+    gap: 2em;
+}
+
+.spaces-view-header {
+    font-size: 24px;
+}
+
+.spaces-view-content-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    /* grid-template-columns: 1fr 1fr 1fr; */
+    gap: 1em;
+}
+
+.user-space-navigator {
+    background-color: var(--gray);
+    /* overflow: hidden; */
+    width: 250px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 1em;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    border-radius: 5px;
+}
+
+.user-space-name {
+    overflow: hidden;
+    width: auto;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.user-space-tags-wrapper {
+
+}
+
+.user-space-tag {
+    font-size: 9px;
+    background-color: var(--red);
+    width: fit-content;
+    padding: 0.40em;
+    border-radius: 0.5em;
+}

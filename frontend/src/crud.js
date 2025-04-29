@@ -42,10 +42,14 @@ export async function toggleSpaceDisplay(email, spaceId, shown) {
 
 export async function updateUserDeliverables(email, deliverables) {
     try {
-        await axios.put(APP_URL + "/user/update-deliverables", {
-            email: email,
-            new_deliverables: deliverables,
-        });
+        const response = await axios.put(
+            APP_URL + "/user/update-deliverables", {
+                email: email,
+                new_deliverables: deliverables,
+            }
+        );
+
+        return response.data.new_deliverables_with_id;
     } catch (err) {
         throw err;
     }
@@ -53,10 +57,14 @@ export async function updateUserDeliverables(email, deliverables) {
 
 export async function updateTodos(email, todos) {
     try {
-        await axios.put(APP_URL + "/user/update-todos", {
+        const response = await axios.put(APP_URL + "/user/update-todos", {
             email: email,
             new_todos: todos,
         });
+
+        console.log("response:", response);
+
+        return response.data.new_todos_with_id;
     } catch (err) {
         throw err;
     }

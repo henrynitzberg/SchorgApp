@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
-// import { fetchUserData } from "../crud.js";
 import Sidebar from "../components/Sidebar.jsx";
 import CalendarWeek from "../components/CalendarWeek.jsx";
 import SelectedSpace from "../components/SelectedSpace.jsx";
+import Navbar from "../components/Navbar.jsx";
+import SpacesView from "../components/SpacesView.jsx";
 
 import "../css/Gage.css";
 
@@ -20,12 +21,12 @@ export default function Gage() {
   const [userSpaces, setUserSpaces] = useState([]);
   const [gageUser, setGageUser] = useState(null);
 
-  const [view, setView] = useState("calendarWeek");
+  const [view, setView] = useState("calendar");
   const [selectedSpaceInfo, setSelectedSpaceInfo] = useState(null);
 
   function openSpace(e, space) {
     e.preventDefault();
-    setView("space");
+    setView("selected-space");
     setSelectedSpaceInfo(space);
   }
 
@@ -70,7 +71,8 @@ export default function Gage() {
         openSpace={openSpace}
       />
       <div className="hero-wrapper">
-        {view === "calendarWeek" && (
+        <Navbar view={view} setView={setView} />
+        {view === "calendar" && (
           <CalendarWeek
             user={gageUser}
             userTodos={userTodos}
@@ -81,7 +83,12 @@ export default function Gage() {
             setUserSpaces={setUserSpaces}
           />
         )}
-        {view === "space" && <SelectedSpace space={selectedSpaceInfo} />}
+        {view === "selected-space" && (
+          <SelectedSpace space={selectedSpaceInfo} />
+        )}
+        {view === "spaces" && (
+          <SpacesView userSpaces={userSpaces} openSpace={openSpace} />
+        )}
       </div>
     </div>
   );

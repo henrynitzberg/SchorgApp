@@ -1,0 +1,33 @@
+.navbar-wrapper {
+    width: 100%;
+    padding: 1em;
+    border-radius: 10px;
+
+    background-color: var(--dark-gray);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.navbar-content-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+.navbar-view-button {
+    padding: 1em;
+    font-size: 14px;
+    background-color: var(--gray);
+    border-radius: 5px;
+    min-width: 100px;
+}
+
+.navbar-view-button-selected {
+    padding: 1em;
+    font-size: 14px;
+    background-color: var(--gray);
+    border: 1px solid var(--text-gray);
+    border-radius: 5px;
+    min-width: 100px;
+}
+
+
