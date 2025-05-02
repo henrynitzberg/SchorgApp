@@ -22,13 +22,13 @@ export default function SpacesView({ userSpaces, openSpace }) {
     <div className="spaces-view-wrapper">
       <h1 className="spaces-view-header">Spaces</h1>
       <div className="spaces-view-content-wrapper">
-        {sampleSpaces.map((userSpace, i) => {
+        {userSpaces.map((userSpace, i) => {
           return (
             <button
               key={i}
               className="user-space-navigator"
-              onClick={(e) => {
-                openSpace(e, userSpace);
+              onClick={async (e) => {
+                await openSpace(e, userSpace._id);
               }}
             >
               <p className="user-space-name">{userSpace.name}</p>

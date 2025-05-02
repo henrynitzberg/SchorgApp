@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 
 import {
-  fetchSpaceData,
+  accessClass,
   updateUserDeliverables,
   updateSpacePeople,
   updateUserSpaces,
@@ -43,7 +43,7 @@ export default function AddSpacePopUp({
   async function submitAccessToken(e) {
     e.preventDefault();
     try {
-      const space = await fetchSpaceData(enteredToken);
+      const space = await accessClass(enteredToken);
 
       for (const userSpace of userSpaces) {
         if (space.data._id === userSpace._id) {

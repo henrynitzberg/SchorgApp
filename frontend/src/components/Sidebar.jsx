@@ -87,7 +87,7 @@ export default function Sidebar({
             <div key={i} className="space-selector-wrapper">
               <button
                 className="space-selector"
-                onClick={(e) => openSpace(e, space)}
+                onClick={async (e) => await openSpace(e, space._id)}
               >
                 {space.name}
               </button>

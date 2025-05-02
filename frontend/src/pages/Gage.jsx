@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+
+import { fetchSpaceData } from "../crud.js";
+
 import axios from "axios";
 
 import Sidebar from "../components/Sidebar.jsx";
@@ -24,10 +27,12 @@ export default function Gage() {
   const [view, setView] = useState("calendar");
   const [selectedSpaceInfo, setSelectedSpaceInfo] = useState(null);
 
-  function openSpace(e, space) {
+  async function openSpace(e, spaceId) {
+    const space = await fetchSpaceData(spaceId);
+    console.log("space:", space);
     e.preventDefault();
     setView("selected-space");
-    setSelectedSpaceInfo(space);
+    setSelectedSpaceInfo(space.data);
   }
 
   useEffect(() => {

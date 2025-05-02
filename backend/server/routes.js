@@ -147,6 +147,24 @@ app.post("/user/info", async (req, res) => {
 })
 
 app.post("/space/info", async (req, res) => {
+    const spaceId = req.body.space_id;
+    console.log("id:", spaceId);
+    try {
+        const fetchedSpace = await space.getSpace(spaceId);
+        if (fetchedSpace === null) {
+            return res.status(404).send({
+                error: "Space not found. Invalid id."
+            });
+        }
+        return res.send(fetchedSpace);
+    }
+    catch (err) {
+        console.error(err);
+        return res.status(404).send({ error: err });
+    }
+})
+
+app.post("/space/access", async (req, res) => {
     const access_code = req.body.access_code;
     try {
         const fetchedSpace = await space.getSpace(access_code);

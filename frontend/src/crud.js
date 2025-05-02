@@ -15,9 +15,23 @@ export async function fetchUserData(email) {
     }
 }
 
-export async function fetchSpaceData(accessCode) {
+export async function fetchSpaceData(spaceId) {
+    console.log("id from crud:", spaceId);
     try {
         const space = await axios.post(APP_URL + "/space/info", {
+            space_id: spaceId
+        });
+
+        return space;
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+export async function accessClass(accessCode) {
+    try {
+        const space = await axios.post(APP_URL + "/space/access", {
             access_code: accessCode,
         });
 

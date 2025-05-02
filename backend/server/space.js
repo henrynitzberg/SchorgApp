@@ -1,12 +1,13 @@
 const { MongoClient } = require("mongodb");
 const ObjectId = require("mongodb").ObjectId;
 
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv");
+dotenv.config();
 const mongo_uri = process.env.MONGO_URI;
 
 const client = new MongoClient(mongo_uri);
 
-async function getSpace(access_code) {
+async function getSpaceAccess(access_code) {
     try {
         await client.connect();
 
@@ -17,7 +18,27 @@ async function getSpace(access_code) {
             access_code: access_code
         });
 
-        console.log(space);
+        return space;
+    }
+    catch (err) {
+        throw err;
+    }
+    finally {
+        await client.close();
+    }
+}
+
+async function getSpace(spaceId) {
+    try {
+        await client.connect();
+
+        const db = client.db("Gage");
+        const collection = db.collection("Spaces");
+
+        const space = await collection.findOne({
+            _id: ObjectId.createFromHexString(spaceId)
+        });
+
 
         return space;
     }
@@ -52,6 +73,7 @@ async function writePeople(spaceId, people) {
 }
 
 module.exports = {
+    getSpaceAccess: getSpaceAccess,
     getSpace: getSpace,
     writePeople: writePeople,
 };

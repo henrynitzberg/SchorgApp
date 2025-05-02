@@ -1,7 +1,11 @@
 .selected-space-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
     height: 100%;
     padding: 1.5em;
     background-color: var(--dark-gray);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     border-radius: 10px;
 }
 
@@ -25,10 +29,106 @@
     background-color: var(--gray);
     padding: 0.5em;
     border-radius: 5px;
+    font-size: 14px;
 }
 
 .forum-nav-img {
     filter: invert(1);
+    width: 18px;
+    height: 18px;
+}
+
+.selected-space-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.selected-space-content-top-bar {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr 0.5fr;
+    grid-gap: 1em;
+    padding: 0.5em 1em 0em 1em;
+    /* border-bottom: 2px solid var(--gray); */
+}
+
+.selected-space-content-top-bar-title {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.selected-space-content-header {
+    font-size: 16px;
+}
+
+.selected-space-deliverable-title {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.selected-space-deliverables-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+}
+
+.selected-space-deliverable-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr 0.5fr;
+    grid-gap: 1em;
+    background-color: var(--gray);
+    padding: 1em;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.selected-space-deliverable-wrapper:hover {
+    background-color: var(--dark-gray);
+    border: 1px solid var(--gray);
+}
+
+.selected-space-deliverable-due-date {
+    color: var(--text-gray);
+    font-size: 14px;
+}
+
+.selected-space-deliverable-status-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gaP: 0.5em;
+}
+
+.selected-space-deliverable-status-indicator {
+    height: 10px;
+    width: 10px;
+    border-radius: 100px;
+    background-color: var(--red);
+}
+
+.selected-space-deliverable-status {
+    font-size: 14px;
+    /* color: var(--text-gray); */
+}
+
+.selected-space-deliverable-grade-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.selected-space-deliverable-grade-toggle {
+    display: grid;
+    place-content: center;
+}
+
+.selected-space-deliverable-grade-icon {
+    filter: invert(1);
     width: 20px;
     height: 20px;
+}
+
+.selected-space-deliverable-grade {
+    font-size: 14px;
 }
