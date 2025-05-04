@@ -81,7 +81,7 @@ export default function Sidebar({
         </div>
         <h1 className="sidebar-top-title">Todo</h1>
       </div>
-      <div className="sidebar-bottom">
+      {/* <div className="sidebar-bottom">
         <div className="sidebar-bottom-widget">
           {userSpaces.map((space, i) => (
             <div key={i} className="space-selector-wrapper">
@@ -126,7 +126,7 @@ export default function Sidebar({
           />
         )}
         <h1 className="sidebar-bottom-title">Your Spaces</h1>
-      </div>
+      </div> */}
     </div>
   );
 }

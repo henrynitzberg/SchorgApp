@@ -73,7 +73,7 @@ export default function SelectedSpace({ space }) {
                       ? showGrades
                         ? deliverable.grade + "/" + deliverable.max_grade
                         : "---"
-                      : "N?A"}
+                      : "N/A"}
                   </p>
                 </button>
               );

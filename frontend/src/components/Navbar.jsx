@@ -24,7 +24,7 @@ export default function Navbar({ view, setView }) {
         >
           Todo
         </button>
-        <button
+        {/* <button
           className={
             view === "spaces"
               ? "navbar-view-button-selected"
@@ -33,7 +33,7 @@ export default function Navbar({ view, setView }) {
           onClick={() => setView("spaces")}
         >
           Spaces
-        </button>
+        </button> */}
       </div>
     </nav>
   );
