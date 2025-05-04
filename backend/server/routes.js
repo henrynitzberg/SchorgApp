@@ -77,11 +77,15 @@ app.post("/auth/standard-login", async (req, res) => {
                 message: "This email is registered with Google."
             })
         }
-        
-        const auth = await bcrypt.compare(password, fetchedUser.password);
-        if (!auth) {
+
+        if (password !== fetchedUser.password) {
             return res.status(409).json({ message: "Incorrect password."});
         }
+        
+        // const auth = await bcrypt.compare(password, fetchedUser.password);
+        // if (!auth) {
+        //     return res.status(409).json({ message: "Incorrect password."});
+        // }
 
         return res.status(200).json({
             message: "Successfully logged in!",
