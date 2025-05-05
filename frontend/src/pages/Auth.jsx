@@ -35,7 +35,8 @@ export default function Auth() {
       });
       console.log(user);
       localStorage.setItem("auth", "true");
-      navigate("/gage", { state: { email: email } });
+      localStorage.setItem("email", email);
+      navigate("/gage");
     } catch (err) {
       console.error(err);
     }
@@ -54,7 +55,8 @@ export default function Auth() {
       });
       console.log(user);
       localStorage.setItem("auth", "true");
-      navigate("/gage", { state: { email: email } });
+      localStorage.setItem("email", email);
+      navigate("/gage");
     } catch (err) {
       console.error(err);
     }
@@ -78,7 +80,8 @@ export default function Auth() {
       });
       console.log(user.data);
       localStorage.setItem("auth", "true");
-      navigate("/gage", { state: { email: email } });
+      localStorage.setItem("email", email);
+      navigate("/gage");
     } catch (err) {
       console.error(err);
     }
@@ -98,7 +101,8 @@ export default function Auth() {
       });
       console.log(user.data);
       localStorage.setItem("auth", "true");
-      navigate("/gage", { state: { email: email } });
+      localStorage.setItem("email", email);
+      navigate("/gage");
     } catch (err) {
       console.error(err);
     }

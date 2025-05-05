@@ -1,0 +1,322 @@
+.todo-view-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    height: 100%;
+    padding: 1.5em;
+    background-color: var(--dark-gray);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+}
+
+.todo-view-header {
+    font-size: 24px;
+}
+
+.todo-view-header-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forum-nav-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5em;
+    align-items: center;
+    background-color: var(--gray);
+    padding: 0.5em;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.forum-nav-img {
+    filter: invert(1);
+    width: 18px;
+    height: 18px;
+}
+
+.todo-view-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.todo-view-content-top-bar {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr 0.5fr;
+    grid-gap: 1em;
+    padding: 0.5em 1em 0em 1em;
+    /* border-bottom: 2px solid var(--gray); */
+}
+
+.todo-view-content-top-bar-title {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.todo-view-content-header {
+    font-size: 16px;
+}
+
+.todo-view-deliverable-title {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.todo-view-deliverable-title:hover {
+    text-decoration: underline;
+}
+
+.todo-view-deliverables-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+}
+
+.todo-view-deliverable-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.todo-view-deliverable {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    background-color: var(--gray);
+    padding: 1em;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.todo-view-deliverable-left {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
+.todo-view-toggle-deliverable {
+    display: grid;
+    place-content: center;
+}
+
+.todo-view-toggle-deliverable-icon {
+    filter: invert(1);
+    width: 14px;
+    height: 14px
+}
+
+.todo-view-deliverable-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
+}
+
+.todo-view-deliverable-due-date {
+    color: var(--text-gray);
+    font-size: 12px;
+}
+
+.todo-view-deliverable-due-date:hover {
+    text-decoration: underline;
+}
+
+.todo-view-visit-deliverable {
+    display: grid;
+    place-content: center;
+}
+
+.todo-view-visit-deliverable-icon {
+    filter: invert(1);
+    width: 18px;
+    height: 18px
+}
+
+.todo-view-deliverables-todos-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 0 1.5em;
+    gap: 0.25em;
+    /* gap: 0.5em; */
+}
+
+.todo-view-deliverable-todo {
+    display: flex;
+    flex-direction: column;
+}
+
+.todo-view-deliverable-todo-edit {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--gray);
+}
+
+.todo-view-deliverable-todo-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 0.75em;
+    padding: 0.75em;
+    background-color: var(--gray);
+    border-radius: 5px;
+}
+
+.todo-view-deliverable-todo-wrapper-edit {
+    display: flex;
+    flex-direction: row;
+    gap: 0.75em;
+    padding: 0.75em;
+    background-color: var(--dark-gray);
+    border-radius: 5px;
+}
+
+.todo-view-deliverable-todo-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--text-gray);
+    border-radius: 50%;
+    background-color: transparent;
+    position: relative;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    margin-top: 0.125em;
+}
+  
+.todo-view-deliverable-todo-checkbox::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--text-gray);
+    transform: scale(0);
+    transition: transform 0.15s ease-in-out;
+}
+  
+.todo-view-deliverable-todo-checkbox:checked::before {
+    transform: scale(1);
+}
+
+.todo-view-deliverable-todo-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.todo-view-deliverable-todo-content-wrapper-edit {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5em;
+}
+
+.todo-view-deliverable-todo-header {
+    font-size: 14px;
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    resize: none;
+    white-space: pre-wrap;
+    overflow: hidden;
+}
+
+.todo-view-deliverable-todo-header-edit {
+    font-size: 14px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--text-gray);
+    width: 100%;
+    resize: none;
+    white-space: pre-wrap;
+    overflow: hidden;
+    font-weight: 700;
+    padding-bottom: 6px;
+}
+
+.todo-view-deliverable-todo-header-complete {
+    font-size: 14px;
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    resize: none;
+    white-space: pre-wrap;
+    text-decoration: line-through;
+    overflow: hidden;
+}
+
+.todo-view-deliverable-todo-duration {
+    display: flex;
+    flex-direction: row;
+    font-size: 12px;
+    width: 100%;
+}
+
+.todo-view-deliverable-todo-start-date {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25em;
+    background-color: transparent;
+    border: none;
+    width: fit-content;
+}
+
+.todo-view-deliverable-todo-start-date-icon {
+    filter: invert(70%) sepia(0%) saturate(54%) hue-rotate(211deg) brightness(92%) contrast(88%);
+    width: 14px;
+    height: 14px;
+}
+
+.todo-view-deliverable-todo-start-date-text {
+    color: var(--text-gray);
+    font-size: 12px;
+    width: fit-content;
+}
+
+.todo-view-deliverable-todo-start-date:hover {
+    text-decoration: underline;
+}
+
+.todo-view-deliverable-todo-edit-button {
+    display: grid;
+    place-content: center;
+    align-self: flex-start;
+    margin-top: 0.125em;
+}
+
+.todo-view-deliverable-todo-edit-icon {
+    filter: invert(1);
+    width: 18px;
+    height: 18px;
+}
+
+.todo-view-deliverable-crud-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    padding: 0 0.75em 0.75em 0.75em;
+    align-self: flex-end;
+}
+
+.todo-view-deliverable-save-button {
+    font-size: 11px;
+    width: 65px;
+    border-radius: 5px;
+    color: var(--dark-gray);
+    background-color: var(--text-gray);
+}
+
+.todo-view-deliverable-cancel-button {
+    font-size: 11px;
+    width: 65px;
+    border: 1px solid var(--text-gray);
+    border-radius: 5px;
+    padding: 0.25em;
+}

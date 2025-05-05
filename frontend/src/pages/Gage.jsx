@@ -10,6 +10,7 @@ import CalendarWeek from "../components/CalendarWeek.jsx";
 import SelectedSpace from "../components/SelectedSpace.jsx";
 import Navbar from "../components/Navbar.jsx";
 import SpacesView from "../components/SpacesView.jsx";
+import TodoView from "../components/TodoView.jsx";
 
 import "../css/Gage.css";
 
@@ -17,7 +18,6 @@ const APP_URL = "http://localhost:8000";
 
 export default function Gage() {
   const navigate = useNavigate();
-  const state = useLocation().state;
 
   const [userTodos, setUserTodos] = useState([]);
   const [userDeliverables, setUserDeliverables] = useState([]);
@@ -58,7 +58,8 @@ export default function Gage() {
       }
     }
 
-    fetchUserData(state.email);
+    const email = localStorage.getItem("email");
+    fetchUserData(email);
   }, []);
 
   // localStorage.clear();
@@ -80,6 +81,16 @@ export default function Gage() {
         {view === "calendar" && (
           <CalendarWeek
             user={gageUser}
+            userTodos={userTodos}
+            setUserTodos={setUserTodos}
+            userDeliverables={userDeliverables}
+            setUserDeliverables={setUserDeliverables}
+            userSpaces={userSpaces}
+            setUserSpaces={setUserSpaces}
+          />
+        )}
+        {view === "todo" && (
+          <TodoView
             userTodos={userTodos}
             setUserTodos={setUserTodos}
             userDeliverables={userDeliverables}
