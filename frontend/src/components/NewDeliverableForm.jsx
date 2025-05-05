@@ -6,7 +6,7 @@ import "../css/NewDeliverableForm.css";
 export default function NewDeliverableForm({
   position,
   initialDueDay,
-  onSubmit,
+  onSave,
   onClose,
 }) {
   const popupRef = useRef(null);
@@ -150,7 +150,7 @@ export default function NewDeliverableForm({
             return;
           }
 
-          onSubmit({
+          onSave({
             title,
             description,
             dueDate,

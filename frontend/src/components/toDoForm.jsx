@@ -7,8 +7,8 @@ export default function ToDoForm({
   initialStartTime,
   initialEndTime,
   deliverables,
-  onClose,
   onSave,
+  onClose,
   onEdit,
   editMode,
   eventData = null,
@@ -56,7 +56,7 @@ export default function ToDoForm({
     }, 3000);
   };
 
-  const handleNewSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
 
@@ -113,70 +113,14 @@ export default function ToDoForm({
       (deliverable) => deliverable.title === deliverableTitle
     );
 
-    onSave({ title, description, startTime, endTime, deliverable });
-    onClose();
-  };
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    const form = e.target;
-
-    const title = form.title.value;
-    if (!title || title.length === 0) {
-      setTitleErrorMessage("Please enter a title.");
-      clearErrorAfterDelay();
-      return;
+    if (editMode) {
+      onEdit(
+        { title, description, startTime, endTime, deliverable },
+        eventData._id
+      );
+    } else {
+      onSave({ title, description, startTime, endTime, deliverable });
     }
-
-    const description = form.description.value;
-
-    const startTime = form.startTime.value;
-    const endTime = form.endTime.value;
-    if (!startTime || !endTime) {
-      setTimeErrorMessage("Please enter a start and end time.");
-      clearErrorAfterDelay();
-      return;
-    }
-
-    const startHour = parseInt(startTime.split(":")[0]);
-    const startMinute = parseInt(startTime.split(":")[1]);
-    const endHour = parseInt(endTime.split(":")[0]);
-    const endMinute = parseInt(endTime.split(":")[1]);
-
-    // Check if start time is before end time
-    if (
-      startHour > endHour ||
-      (startHour === endHour && startMinute >= endMinute)
-    ) {
-      setTimeErrorMessage("Start time must be before end time.");
-      clearErrorAfterDelay();
-      return;
-    }
-
-    if (
-      startHour < 0 ||
-      startHour > 23 ||
-      startMinute < 0 ||
-      startMinute > 59
-    ) {
-      setTimeErrorMessage("Please enter a valid start time.");
-      clearErrorAfterDelay();
-      return;
-    }
-    if (endHour < 0 || endHour > 23 || endMinute < 0 || endMinute > 59) {
-      setTimeErrorMessage("Please enter a valid end time.");
-      clearErrorAfterDelay();
-      return;
-    }
-
-    const deliverableTitle = form.deliverable.value;
-    const deliverable = deliverables.find(
-      (deliverable) => deliverable.title === deliverableTitle
-    );
-
-    onEdit(
-      { title, description, startTime, endTime, deliverable },
-      eventData._id
-    );
     onClose();
   };
 
@@ -217,7 +161,7 @@ export default function ToDoForm({
         </div>
       )}
 
-      <form onSubmit={editMode ? handleEditSubmit : handleNewSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="todo-popup-title">
           {" "}
           {editMode ? "Edit ToDo" : "New ToDo"}{" "}

@@ -111,6 +111,13 @@ async function writeDeliverables(email, deliverables) {
         const db = client.db("Gage");
         const users = db.collection("Users");
 
+        deliverables = deliverables.map((deliverable) => {
+            return {
+                ...deliverable,
+                _id: new ObjectId(),
+            }
+        })
+
         await users.updateOne(
             { email: email },
             { $push: {
@@ -119,6 +126,8 @@ async function writeDeliverables(email, deliverables) {
                 }
             } }
         );
+
+        return deliverables;
     }
     catch (err) {
         throw err;
@@ -137,8 +146,8 @@ async function writeTodos(email, todos) {
         todos = todos.map((todo) => {
             return {
                 ...todo,
+                deliverable: todo.deliverable ? ObjectId.createFromHexString(todo.deliverable) : null,
                 _id: new ObjectId(),
-                deliverable: todo.deliverable ? ObjectId.createFromHexString(todo.deliverable) : null
             }
         });
 
@@ -158,18 +167,17 @@ async function writeTodos(email, todos) {
     }
 }
 
-async function removeTodos(email, todos) {
+async function removeTodos(email, todo_ids) {
     try {
         await client.connect();
 
         const db = client.db("Gage");
         const users = db.collection("Users");
 
-        console.log(todos);
+        console.log("removing: ", todo_ids);
 
-        const todo_ids = todos.map((todo) => {
-            // the tostring will be REMOVED once all ids are created on back end
-            return ObjectId.createFromHexString(todo._id).toString();
+        const ids = todo_ids.map((todo_id) => {
+            return ObjectId.createFromHexString(todo_id);
         });
 
         await users.updateOne(
@@ -177,7 +185,7 @@ async function removeTodos(email, todos) {
             { $pull: {
                 todos: {
                     _id: {
-                        $in: todo_ids
+                        $in: ids
                     }
                 }
             } }
@@ -196,8 +204,10 @@ async function editTodo(email, todo) {
         const db = client.db("Gage");
         const users = db.collection("Users");
 
+        console.log("editing todo: ", todo);
+
         await users.updateOne(
-            { email: email, "todos._id": ObjectId.createFromHexString(todo._id).toString() },
+            { email: email, "todos._id": ObjectId.createFromHexString(todo._id) },
             { $set: {
                 "todos.$.title": todo.title,
                 "todos.$.description": todo.description,

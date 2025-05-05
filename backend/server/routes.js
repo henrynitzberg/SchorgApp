@@ -185,8 +185,6 @@ app.put("/user/update-todos", async (req, res) => {
     const email = req.body.email;
     const newTodos = req.body.new_todos;
 
-    console.log("todos from routes:", newTodos);
-
     try {
         const newTodosWithId = await user.writeTodos(email, newTodos);
         
@@ -203,10 +201,10 @@ app.put("/user/update-todos", async (req, res) => {
 
 app.put("/user/remove-todos", async (req, res) => {
     const email = req.body.email;
-    const removedTodos = req.body.removed_todos;
+    const removedTodoIds = req.body.removed_todo_ids;
 
     try {
-        await user.removeTodos(email, removedTodos);
+        await user.removeTodos(email, removedTodoIds);
         
         return res.status(200).json({
             message: "Successfully removed todos."

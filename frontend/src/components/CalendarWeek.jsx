@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format, set } from "date-fns";
-// import { ObjectId } from "bson";
 import ToDoForm from "./toDoForm.jsx";
 import {
   updateUserDeliverables,
@@ -26,23 +25,16 @@ export default function CalendarWeek({
   userSpaces,
   setUserSpaces,
 }) {
-  const [showToDoPopup, setShowToDoPopup] = useState(false);
-  const [showEditToDoPopup, setShowEditToDoPopup] = useState(false);
+  const [popupShowing, setPopupShowing] = useState(false);
+  const [popupPosition, setPopupPosition] = useState(null);
+
   const [showDeliverablePopup, setShowDeliverablePopup] = useState(false);
-  const [clickedOutOfToDoPopup, setClickedOutOfToDoPopup] = useState(false);
-  const [clickedOutOfEditToDoPopup, setClickedOutOfEditToDoPopup] =
-    useState(false);
-  const [clickedOutOfDeliverablePopup, setClickedOutOfDeliverablePopup] =
-    useState(false);
-  const [toDoPopupPosition, setToDoPopupPosition] = useState({ x: 0, y: 0 });
-  const [deliverablePopupPosition, setDeliverablePopupPosition] = useState({
-    x: 0,
-    y: 0,
-  });
-  const [eventPopupDay, setEventPopupDay] = useState(-1);
-  const [selectedToDo, setSelectedToDo] = useState(null); // For editing todo
+  const [showTodoPopup, setShowTodoPopup] = useState(false);
+  const [showEditTodoPopup, setShowEditTodoPopup] = useState(false);
 
   const [selectedDay, setSelectedDay] = useState(null); // For assigning event to day
+  const [selectedToDo, setSelectedToDo] = useState(null); // For editing todo
+
   const [initialStartTime, setInitialStartTime] = useState("00:00"); // optional
   const initialDuration = 1; // in hours
   const [initialEndTime, setInitialEndTime] = useState("00:00"); // optional
@@ -66,7 +58,6 @@ export default function CalendarWeek({
       time_worked: 0,
       space: null,
       space_deliverable: null,
-      _id: new ObjectId(),
     };
 
     try {
@@ -80,16 +71,24 @@ export default function CalendarWeek({
     }
   };
 
-  const handleSaveNewToDo = async (newEventData) => {
+  const getTimeFrame = (todoEventData) => {
     // Convert to full datetime using selectedDay
-    const [startHour, startMinute] = newEventData.startTime.split(":");
-    const [endHour, endMinute] = newEventData.endTime.split(":");
+    const [startHour, startMinute] = todoEventData.startTime.split(":");
+    const [endHour, endMinute] = todoEventData.endTime.split(":");
 
     const start_time = new Date(selectedDay);
     start_time.setHours(startHour, startMinute);
 
     const end_time = new Date(selectedDay);
     end_time.setHours(endHour, endMinute);
+
+    return { start_time, end_time };
+  };
+
+  const handleSaveNewToDo = async (newEventData) => {
+    const time_frame = getTimeFrame(newEventData);
+    const start_time = time_frame.start_time;
+    const end_time = time_frame.end_time;
 
     const todo = {
       title: newEventData.title,
@@ -102,11 +101,9 @@ export default function CalendarWeek({
       space: null,
     };
 
-    console.log(todo);
+    console.log("Saving new todo: ", todo);
     try {
       const newTodosWithId = await updateTodos(user.email, [todo]);
-      console.log(newTodosWithId);
-
       setUserTodos((prev) => [...prev, ...newTodosWithId]);
       console.log(userTodos);
     } catch (err) {
@@ -115,14 +112,9 @@ export default function CalendarWeek({
   };
 
   const handleEditToDo = (eventData, id) => {
-    const [startHour, startMinute] = eventData.startTime.split(":");
-    const [endHour, endMinute] = eventData.endTime.split(":");
-
-    const start_time = new Date(selectedDay);
-    start_time.setHours(startHour, startMinute);
-
-    const end_time = new Date(selectedDay);
-    end_time.setHours(endHour, endMinute);
+    const time_frame = getTimeFrame(eventData);
+    const start_time = time_frame.start_time;
+    const end_time = time_frame.end_time;
 
     const todo_edit = {
       title: eventData.title,
@@ -134,7 +126,7 @@ export default function CalendarWeek({
       _id: id,
     };
 
-    console.log("new version of old todo: ", todo_edit);
+    console.log("saving edited todo: ", todo_edit);
 
     editTodo(user.email, todo_edit);
     setUserTodos((prev) =>
@@ -155,9 +147,10 @@ export default function CalendarWeek({
   };
 
   const handleRemoveToDo = (e) => {
-    const eventData = e;
-    removeTodos(user.email, [eventData]);
-    setUserTodos((prev) => prev.filter((todo) => todo._id !== eventData._id));
+    console.log("removing todo: ", e);
+    const id = e._id;
+    removeTodos(user.email, [id]);
+    setUserTodos((prev) => prev.filter((todo) => todo._id !== id));
   };
 
   const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
@@ -165,7 +158,7 @@ export default function CalendarWeek({
 
   const scrollRef = useRef(null);
 
-  // view calendar starting 4 hours before right now
+  // view calendar starting ~4 hours before right now
   useEffect(() => {
     const targetHour = new Date().getHours() + new Date().getMinutes() / 60 - 4;
     const scrollOffset = pixelsPerHour * targetHour;
@@ -175,18 +168,66 @@ export default function CalendarWeek({
     }
   }, []);
 
-  // console.log("user spaces:", userSpaces);
-  // console.log("user deliverables:", userDeliverables);
-
   return (
-    <div className="calendar-week-wrapper">
+    <div
+      className="calendar-week-wrapper"
+      onContextMenu={(e) => e.preventDefault()}
+    >
+      {/* block ability to open other calendar related popups while one is already showing */}
+      <div className={popupShowing ? "popup-showing" : "popup-hidden"}></div>
+
+      {showDeliverablePopup && (
+        <NewDeliverableForm
+          position={popupPosition}
+          initialDueDay={selectedDay}
+          onSave={handleSaveNewDeliverable}
+          onClose={() => {
+            setPopupShowing(false);
+            setShowDeliverablePopup(false);
+          }}
+        />
+      )}
+
+      {showTodoPopup && (
+        <ToDoForm
+          position={popupPosition}
+          initialStartTime={initialStartTime}
+          initialEndTime={initialEndTime}
+          deliverables={userDeliverables}
+          onSave={handleSaveNewToDo}
+          onClose={() => {
+            setPopupShowing(false);
+            setShowTodoPopup(false);
+          }}
+          editMode={false}
+        />
+      )}
+
+      {showEditTodoPopup && (
+        <ToDoForm
+          position={popupPosition}
+          initialStartTime={"00:00"}
+          initialEndTime={"00:00"}
+          deliverables={userDeliverables}
+          onClose={() => {
+            setShowEditTodoPopup(false);
+            setPopupShowing(false);
+          }}
+          onSave={null}
+          onEdit={handleEditToDo}
+          editMode={true}
+          eventData={selectedToDo}
+          handleRemoveTodo={handleRemoveToDo}
+        />
+      )}
+
       <div className="calendar-week-headers-wrapper">
         <div className="gap-for-hours"> </div>
         {days.map((day, index) => {
           const isToday =
             format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
           return (
-            <div
+            <button
               className={
                 isToday
                   ? "calendar-week-today-header"
@@ -194,30 +235,17 @@ export default function CalendarWeek({
               }
               key={index}
               onClick={(e) => {
-                if (showDeliverablePopup || clickedOutOfDeliverablePopup) {
-                  setClickedOutOfDeliverablePopup(false);
+                if (showDeliverablePopup) {
                   return;
                 }
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                setEventPopupDay(index);
-                setDeliverablePopupPosition({ x, y });
-                setShowDeliverablePopup(true);
+                const x = e.clientX;
+                const y = e.clientY;
+                setPopupPosition({ x, y });
                 setSelectedDay(day);
+                setShowDeliverablePopup(true);
+                setPopupShowing(true);
               }}
             >
-              {showDeliverablePopup && eventPopupDay == index && (
-                <NewDeliverableForm
-                  position={deliverablePopupPosition}
-                  initialDueDay={day}
-                  onSubmit={handleSaveNewDeliverable}
-                  onClose={() => {
-                    setShowDeliverablePopup(false);
-                    setClickedOutOfDeliverablePopup(true);
-                  }}
-                />
-              )}
               <h1 className="number-date">{format(day, "MM/dd")}</h1>
               <h1 className="weekday">{format(day, "EEE")}</h1>
               <div className="dots-wrapper">
@@ -227,11 +255,6 @@ export default function CalendarWeek({
                     const matchingSpace = userSpaces.find(
                       (space) => space._id === todo.space
                     );
-                    // console.log("curr deliv:", todo.title);
-                    // console.log(
-                    //   "does it match:",
-                    //   matchingSpace ? matchingSpace.shown !== false : true
-                    // );
                     return matchingSpace ? matchingSpace.shown !== false : true;
                   })
                   .filter(
@@ -251,7 +274,7 @@ export default function CalendarWeek({
                     );
                   })}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -269,28 +292,21 @@ export default function CalendarWeek({
           ))}
         </div>
         {days.map((day, index) => (
-          <div
+          <button
             key={index}
             className="calendar-week-day-body"
             onClick={(e) => {
-              if (
-                showToDoPopup ||
-                clickedOutOfToDoPopup ||
-                showEditToDoPopup ||
-                clickedOutOfEditToDoPopup
-              ) {
-                setClickedOutOfToDoPopup(false);
-                setClickedOutOfEditToDoPopup(false);
+              if (showTodoPopup) {
                 return;
               }
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = e.clientX - rect.left;
-              const y = e.clientY - rect.top;
-              setEventPopupDay(index);
-              setToDoPopupPosition({ x, y });
-              setShowToDoPopup(true);
 
-              const clickedHour = y / pixelsPerHour;
+              const x = e.clientX;
+              const y = e.clientY;
+              setPopupPosition({ x, y });
+              setSelectedDay(day);
+
+              const rect = e.currentTarget.getBoundingClientRect();
+              const clickedHour = (y - rect.top) / pixelsPerHour;
               const hour = Math.floor(clickedHour);
               // floor to nearest 15 minutes
               const minutes =
@@ -307,24 +323,11 @@ export default function CalendarWeek({
                   .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
                 setInitialEndTime(formattedEndTime);
               }
-              setSelectedDay(day);
+
+              setShowTodoPopup(true);
+              setPopupShowing(true);
             }}
           >
-            {showToDoPopup && eventPopupDay == index && (
-              <ToDoForm
-                position={toDoPopupPosition}
-                initialStartTime={initialStartTime}
-                initialEndTime={initialEndTime}
-                deliverables={userDeliverables}
-                onClose={() => {
-                  setShowToDoPopup(false);
-                  setClickedOutOfToDoPopup(true);
-                }}
-                onSave={handleSaveNewToDo}
-                editMode={false}
-              />
-            )}
-
             {hours.map((hour) => (
               <div
                 key={hour}
@@ -384,24 +387,16 @@ export default function CalendarWeek({
                       height: `${height}px`,
                     }}
                     onContextMenu={(e) => {
-                      if (
-                        showToDoPopup ||
-                        clickedOutOfToDoPopup ||
-                        showEditToDoPopup ||
-                        clickedOutOfEditToDoPopup
-                      ) {
-                        setClickedOutOfToDoPopup(false);
-                        setClickedOutOfEditToDoPopup(false);
+                      if (showEditTodoPopup) {
                         return;
                       }
-                      e.preventDefault();
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const x = e.clientX - rect.left;
-                      const y = e.clientY - rect.top;
-                      setSelectedToDo(event._id);
-                      setToDoPopupPosition({ x, y });
-                      setShowEditToDoPopup(true);
+                      setSelectedToDo(event);
+                      const x = e.clientX;
+                      const y = e.clientY;
+                      setPopupPosition({ x, y });
+                      setShowEditTodoPopup(true);
                       setSelectedDay(day);
+                      setPopupShowing(true);
                     }}
                   >
                     <h1 className="calendar-event-title"> {event.title} </h1>
@@ -409,29 +404,10 @@ export default function CalendarWeek({
                       {format(event.start_time, "hh:mm")}-
                       {format(event.end_time, "hh:mm")}
                     </h1>
-
-                    {/* {showEditToDoPopup && ( */}
-                    {showEditToDoPopup && selectedToDo === event._id && (
-                      <ToDoForm
-                        position={toDoPopupPosition}
-                        initialStartTime={""}
-                        initialEndTime={""}
-                        deliverables={userDeliverables}
-                        onClose={() => {
-                          setShowEditToDoPopup(false);
-                          setClickedOutOfEditToDoPopup(true);
-                        }}
-                        onSave={null}
-                        onEdit={handleEditToDo}
-                        editMode={true}
-                        eventData={event}
-                        handleRemoveTodo={handleRemoveToDo}
-                      />
-                    )}
                   </div>
                 );
               })}
-          </div>
+          </button>
         ))}
       </div>
     </div>
