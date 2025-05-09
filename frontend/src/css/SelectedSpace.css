@@ -121,12 +121,20 @@
 .selected-space-deliverable-grade-toggle {
     display: grid;
     place-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
 .selected-space-deliverable-grade-icon {
     filter: invert(1);
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+    display: block;
 }
 
 .selected-space-deliverable-grade {

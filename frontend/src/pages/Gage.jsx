@@ -91,6 +91,7 @@ export default function Gage() {
         )}
         {view === "todo" && (
           <TodoView
+            user={gageUser}
             userTodos={userTodos}
             setUserTodos={setUserTodos}
             userDeliverables={userDeliverables}

@@ -7,6 +7,8 @@
     background-color: var(--dark-gray);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     border-radius: 10px;
+    position: relative;
+    overflow-y: scroll;
 }
 
 .todo-view-header {
@@ -155,6 +157,7 @@
     display: flex;
     flex-direction: column;
     border: 1px solid var(--gray);
+    border-radius: 8px;
 }
 
 .todo-view-deliverable-todo-wrapper {
@@ -164,6 +167,7 @@
     padding: 0.75em;
     background-color: var(--gray);
     border-radius: 5px;
+    position: relative;
 }
 
 .todo-view-deliverable-todo-wrapper-edit {
@@ -172,7 +176,7 @@
     gap: 0.75em;
     padding: 0.75em;
     background-color: var(--dark-gray);
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
 .todo-view-deliverable-todo-checkbox {
@@ -237,7 +241,7 @@
     white-space: pre-wrap;
     overflow: hidden;
     font-weight: 700;
-    padding-bottom: 6px;
+    padding-bottom: 4px;
 }
 
 .todo-view-deliverable-todo-header-complete {
@@ -266,6 +270,13 @@
     background-color: transparent;
     border: none;
     width: fit-content;
+    text-decoration: none;
+}
+
+.todo-view-deliverable-todo-start-date::selection,
+.todo-view-deliverable-todo-start-date::-moz-selection,
+.todo-view-deliverable-todo-start-date::-webkit-selection {
+    text-decoration: none;
 }
 
 .todo-view-deliverable-todo-start-date-icon {
@@ -313,10 +324,92 @@
     background-color: var(--text-gray);
 }
 
+.todo-view-add-todo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
+    border-bottom: 1px solid var(--gray);
+    font-size: 12px;
+    text-align: left;
+    padding: 1em;
+    transition: padding 0.2s ease;
+    margin-left: 2em;
+}
+
+.todo-view-add-todo:hover {
+    padding: 1.1em 1.25em;
+}
+
+.todo-view-add-todo-icon {
+    filter: invert(1);
+    width: 14px;
+    height: 14px;
+}
+
 .todo-view-deliverable-cancel-button {
     font-size: 11px;
     width: 65px;
     border: 1px solid var(--text-gray);
     border-radius: 5px;
     padding: 0.25em;
+}
+
+.todo-view-undo-button-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.30em;
+    position: absolute;
+    background-color: var(--gray);
+    border-radius: 5px;
+    bottom: 1.5em;
+    left: 1.5em;
+    font-size: 14px;
+    padding: 0.5em 1em;
+    width: fit-content;
+    color: var(--green);
+}
+
+.todo-view-staged-title {
+    font-size: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: fit-content;
+    max-width: 200px;
+}
+
+.todo-view-undo-button-right {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    align-items: center;
+    margin-left: 0.5em;
+}
+
+.todo-view-undo-button {
+    font-size: 14px;
+    background-color: var(--dark-gray);
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    color: var(--red);
+    font-weight: 700;
+}
+
+.todo-view-undo-button:hover {
+    color: var(--dark-gray);
+    background-color: var(--red);
+    font-weight: 700;
+}
+
+.todo-view-undo-close-button {
+    display: grid;
+    place-content: center;
+}
+
+.todo-view-undo-close-icon {
+    filter: invert(1);
+    width: 18px;
+    height: 18px;
 }
