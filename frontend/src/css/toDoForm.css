@@ -1,7 +1,7 @@
 .todo-popup-form {
     display: flex;
     flex-direction: column;
-    position: absolute;
+    position: fixed;
 
     width: 200px;
     background-color: var(--back3);

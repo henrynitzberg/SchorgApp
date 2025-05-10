@@ -93,8 +93,10 @@ export default function CalendarWeek({
     const todo = {
       title: newEventData.title,
       description: newEventData.description,
-      start_time,
-      end_time,
+      startDate: start_time,
+      endDate: end_time,
+      start_time: start_time,
+      end_time: end_time,
       deliverable: newEventData.deliverable
         ? newEventData.deliverable._id
         : null,
@@ -242,6 +244,7 @@ export default function CalendarWeek({
                   if (showDeliverablePopup) {
                     return;
                   }
+
                   const x = e.clientX;
                   const y = e.clientY;
                   setPopupPosition({ x, y });
@@ -289,7 +292,7 @@ export default function CalendarWeek({
         </button>
       </div>
 
-      <div className="calendar-week-body-wrapper">
+      <div className="calendar-week-body-wrapper" ref={scrollRef}>
         <div className="calendar-week-hours-wrapper">
           {hours.map((hour, index) => (
             <h1
@@ -302,7 +305,7 @@ export default function CalendarWeek({
             </h1>
           ))}
         </div>
-        <div className="calendar-week-day-bodys-wrapper" ref={scrollRef}>
+        <div className="calendar-week-day-bodys-wrapper">
           {days.map((day, index) => (
             <button
               key={index}
@@ -417,8 +420,8 @@ export default function CalendarWeek({
                     >
                       <h1 className="calendar-event-title"> {event.title} </h1>
                       <h1 className="calendar-event-time">
-                        {format(event.start_time, "hh:mm")}-
-                        {format(event.end_time, "hh:mm")}
+                        {format(event.start_time, "HH:mm")}-
+                        {format(event.end_time, "HH:mm")}
                       </h1>
                     </div>
                   );

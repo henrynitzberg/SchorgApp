@@ -11,10 +11,6 @@
     position: relative;
 }
 
-.hour-gap {
-    margin-left: 2em;
-}
-
 .calendar-week-header-wrapper {
     display: flex;
     flex-direction: row;
@@ -23,11 +19,10 @@
 }
 
 .calendar-week-headers-wrapper {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     gap: .25em;
     width: 100%;
-    justify-content: space-evenly;
 }
 
 
