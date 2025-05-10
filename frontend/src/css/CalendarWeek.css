@@ -8,10 +8,18 @@
     height: 100%;
     overflow-y: scroll;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    position: relative;
 }
 
-.gap-for-hours {
+.hour-gap {
     margin-left: 2em;
+}
+
+.calendar-week-header-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: .25em;
+    padding-bottom: .25em;
 }
 
 .calendar-week-headers-wrapper {
@@ -20,8 +28,6 @@
     gap: .25em;
     width: 100%;
     justify-content: space-evenly;
-    padding-bottom: .25em;
-    /* position: fixed; */
 }
 
 
@@ -98,16 +104,40 @@
     align-items: center;
 }
 
+.calendar-week-body-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: .25em;
+    width: 100%;
+    height: 100%;
+
+    /* gap: .25em; */
+    /* margin-left: .25em; */
+    overflow-y: scroll;
+    position: relative;
+    /* hide scroll bar */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer and Edge */
+    overflow: -moz-scrollbars-none; /* Firefox */
+    &::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
+}
+
 .calendar-week-day-bodys-wrapper {
     display: flex;
     gap: .25em;
     width: 100%;
     height: 100%;
-    overflow-y: scroll;
     position: relative;
 }
 
 .calendar-week-hours-wrapper {
+    text-align: center;
+    width: 2em;
+    overflow-x: hidden;
+}
+.calendar-week-hours-wrapper-right {
     text-align: center;
     width: 2em;
 }
@@ -146,6 +176,8 @@
     padding: 0.25em;
     border-radius: 0.5em;
     flex-direction: column;
+    text-align: left;
+    padding-left: .5em;
 }
 
 .calendar-event-title {
@@ -156,8 +188,8 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
 .calendar-event-time {
-    padding-left: .25em;
     font-size: 11px;
     font-weight: 400;
     color: var(--back3);
@@ -196,4 +228,40 @@
     z-index: 99;
     margin-left: 2em;
     cursor: pointer;
+}
+
+.switch-week-button-left {
+    width: 2em;
+    height: 100%;
+    background-color: var(--red);
+
+    align-items: center;
+
+    border-top-left-radius: 1em;
+    border-top-right-radius: .25em;
+    border-bottom-left-radius: .25em;
+    border-bottom-right-radius: .25em;
+}
+
+.switch-week-button-right {
+    width: 2em;
+    height: 100%;
+    background-color: var(--red);
+
+    align-items: center;
+
+    border-top-left-radius: .25em;
+    border-top-right-radius: 1em;
+    border-bottom-left-radius: .25em;
+    border-bottom-right-radius: .25em;
+}
+
+.arrow-left {
+    font-size: 12px;
+    font-weight: 1000;
+}
+
+.arrow-right {
+    font-size: 12px;
+    font-weight: 1000;
 }

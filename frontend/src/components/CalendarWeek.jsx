@@ -153,7 +153,7 @@ export default function CalendarWeek({
     setUserTodos((prev) => prev.filter((todo) => todo._id !== id));
   };
 
-  const weekStart = startOfWeek(startDate, { weekStartsOn: 7 }); // Sunday
+  const [weekStart, setWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 7 })); // Sunday
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   const scrollRef = useRef(null);
@@ -220,65 +220,76 @@ export default function CalendarWeek({
           handleRemoveTodo={handleRemoveToDo}
         />
       )}
-
-      <div className="calendar-week-headers-wrapper">
-        <div className="gap-for-hours"> </div>
-        {days.map((day, index) => {
-          const isToday =
-            format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
-          return (
-            <button
-              className={
-                isToday
-                  ? "calendar-week-today-header"
-                  : "calendar-week-day-header"
-              }
-              key={index}
-              onClick={(e) => {
-                if (showDeliverablePopup) {
-                  return;
+      <div className="calendar-week-header-wrapper">
+        <button className="switch-week-button-left" onClick={() => {
+          setWeekStart(startOfWeek(addDays(weekStart, -7), { weekStartsOn: 7 }));
+        }}>
+      <div className="arrow-left">prev</div>
+        </button>
+        <div className="calendar-week-headers-wrapper">
+          {days.map((day, index) => {
+            const isToday =
+              format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
+            return (
+              <button
+                className={
+                  isToday
+                    ? "calendar-week-today-header"
+                    : "calendar-week-day-header"
                 }
-                const x = e.clientX;
-                const y = e.clientY;
-                setPopupPosition({ x, y });
-                setSelectedDay(day);
-                setShowDeliverablePopup(true);
-                setPopupShowing(true);
-              }}
-            >
-              <h1 className="number-date">{format(day, "MM/dd")}</h1>
-              <h1 className="weekday">{format(day, "EEE")}</h1>
-              <div className="dots-wrapper">
-                {/* add deadlines */}
-                {userDeliverables
-                  .filter((todo) => {
-                    const matchingSpace = userSpaces.find(
-                      (space) => space._id === todo.space
-                    );
-                    return matchingSpace ? matchingSpace.shown !== false : true;
-                  })
-                  .filter(
-                    (event) =>
-                      format(event.due_date, "yyyy-MM-dd") ===
-                      format(day, "yyyy-MM-dd")
-                  )
-                  .slice(0, 4)
-                  .map((event, index) => {
-                    return (
-                      (index < 3 && <div key={index} className="dot"></div>) ||
-                      (index === 3 && (
-                        <div key={index} className="header-ellipses">
-                          ...
-                        </div>
-                      ))
-                    );
-                  })}
-              </div>
-            </button>
-          );
-        })}
+                key={index}
+                onClick={(e) => {
+                  if (showDeliverablePopup) {
+                    return;
+                  }
+                  const x = e.clientX;
+                  const y = e.clientY;
+                  setPopupPosition({ x, y });
+                  setSelectedDay(day);
+                  setShowDeliverablePopup(true);
+                  setPopupShowing(true);
+                }}
+              >
+                <h1 className="number-date">{format(day, "MM/dd")}</h1>
+                <h1 className="weekday">{format(day, "EEE")}</h1>
+                <div className="dots-wrapper">
+                  {/* add deadlines */}
+                  {userDeliverables
+                    .filter((todo) => {
+                      const matchingSpace = userSpaces.find(
+                        (space) => space._id === todo.space
+                      );
+                      return matchingSpace ? matchingSpace.shown !== false : true;
+                    })
+                    .filter(
+                      (event) =>
+                        format(event.due_date, "yyyy-MM-dd") ===
+                        format(day, "yyyy-MM-dd")
+                    )
+                    .slice(0, 4)
+                    .map((event, index) => {
+                      return (
+                        (index < 3 && <div key={index} className="dot"></div>) ||
+                        (index === 3 && (
+                          <div key={index} className="header-ellipses">
+                            ...
+                          </div>
+                        ))
+                      );
+                    })}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        <button className="switch-week-button-right" onClick={() => { 
+          setWeekStart(startOfWeek(addDays(weekStart, 7), { weekStartsOn: 7 }));
+        }}>
+          <div className="arrow-right">next</div>
+        </button>
       </div>
-      <div className="calendar-week-day-bodys-wrapper" ref={scrollRef}>
+
+      <div className="calendar-week-body-wrapper">
         <div className="calendar-week-hours-wrapper">
           {hours.map((hour, index) => (
             <h1
@@ -291,124 +302,131 @@ export default function CalendarWeek({
             </h1>
           ))}
         </div>
-        {days.map((day, index) => (
-          <button
-            key={index}
-            className="calendar-week-day-body"
-            onClick={(e) => {
-              if (showTodoPopup) {
-                return;
-              }
+        <div className="calendar-week-day-bodys-wrapper" ref={scrollRef}>
+          {days.map((day, index) => (
+            <button
+              key={index}
+              className="calendar-week-day-body"
+              onClick={(e) => {
+                if (showTodoPopup) {
+                  return;
+                }
 
-              const x = e.clientX;
-              const y = e.clientY;
-              setPopupPosition({ x, y });
-              setSelectedDay(day);
+                const x = e.clientX;
+                const y = e.clientY;
+                setPopupPosition({ x, y });
+                setSelectedDay(day);
 
-              const rect = e.currentTarget.getBoundingClientRect();
-              const clickedHour = (y - rect.top) / pixelsPerHour;
-              const hour = Math.floor(clickedHour);
-              // floor to nearest 15 minutes
-              const minutes =
-                Math.floor(Math.floor((clickedHour - hour) * 60) / 15) * 15;
-              const formattedStartTime = `${hour
-                .toString()
-                .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-              setInitialStartTime(formattedStartTime);
-              if (24 - clickedHour < initialDuration) {
-                setInitialEndTime("23:59");
-              } else {
-                const formattedEndTime = `${(hour + initialDuration)
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clickedHour = (y - rect.top) / pixelsPerHour;
+                const hour = Math.floor(clickedHour);
+                // round to nearest 15 minutes
+                let minutes =
+                  Math.round(Math.round((clickedHour - hour) * 60) / 15) * 15;
+                
+                if (minutes === 60) {
+                  minutes = 45;
+                }
+                const formattedStartTime = `${hour
                   .toString()
                   .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-                setInitialEndTime(formattedEndTime);
-              }
+                setInitialStartTime(formattedStartTime);
+                if (24 - clickedHour < initialDuration) {
+                  setInitialEndTime("23:59");
+                } else {
+                  const formattedEndTime = `${(hour + initialDuration)
+                    .toString()
+                    .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+                  setInitialEndTime(formattedEndTime);
+                }
 
-              setShowTodoPopup(true);
-              setPopupShowing(true);
-            }}
-          >
-            {hours.map((hour) => (
-              <div
-                key={hour}
-                className="calendar-week-hour"
-                style={{ height: `${pixelsPerHour}px` }}
-              ></div>
-            ))}
+                setShowTodoPopup(true);
+                setPopupShowing(true);
+              }}
+            >
+              {hours.map((hour) => (
+                <div
+                  key={hour}
+                  className="calendar-week-hour"
+                  style={{ height: `${pixelsPerHour}px` }}
+                ></div>
+              ))}
 
-            {/* add current time line marker */}
-            {format(day, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") && (
-              <div
-                className="current-time-line"
-                style={{
-                  top: `${
-                    pixelsPerHour *
-                    (new Date().getHours() + new Date().getMinutes() / 60)
-                  }px`,
-                }}
-              ></div>
-            )}
+              {/* add current time line marker */}
+              {format(day, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") && (
+                <div
+                  className="current-time-line"
+                  style={{
+                    top: `${
+                      pixelsPerHour *
+                      (new Date().getHours() + new Date().getMinutes() / 60)
+                    }px`,
+                  }}
+                ></div>
+              )}
 
-            {/* add events */}
-            {userTodos
-              .filter((todo) => {
-                const matchingDeliverable = userDeliverables.find(
-                  (deliverable) => deliverable._id === todo.deliverable
-                );
+              {/* add events */}
+              {userTodos
+                .filter((todo) => {
+                  const matchingDeliverable = userDeliverables.find(
+                    (deliverable) => deliverable._id === todo.deliverable
+                  );
 
-                if (!matchingDeliverable) return true;
+                  if (!matchingDeliverable) return true;
 
-                const matchingSpace = userSpaces.find(
-                  (space) => space._id === matchingDeliverable.space
-                );
+                  const matchingSpace = userSpaces.find(
+                    (space) => space._id === matchingDeliverable.space
+                  );
 
-                return matchingSpace ? matchingSpace.shown !== false : true;
-              })
-              .filter(
-                (event) =>
-                  format(event.start_time, "yyyy-MM-dd") ===
-                  format(day, "yyyy-MM-dd")
-              )
-              .map((event, index) => {
-                const startHour =
-                  new Date(event.start_time).getHours() +
-                  new Date(event.start_time).getMinutes() / 60;
-                const endHour =
-                  new Date(event.end_time).getHours() +
-                  new Date(event.end_time).getMinutes() / 60;
-                const top = startHour * pixelsPerHour;
-                const height = (endHour - startHour) * pixelsPerHour;
-                return (
-                  <div
-                    key={index}
-                    className="calendar-event"
-                    style={{
-                      top: `${top}px`,
-                      height: `${height}px`,
-                    }}
-                    onContextMenu={(e) => {
-                      if (showEditTodoPopup) {
-                        return;
-                      }
-                      setSelectedToDo(event);
-                      const x = e.clientX;
-                      const y = e.clientY;
-                      setPopupPosition({ x, y });
-                      setShowEditTodoPopup(true);
-                      setSelectedDay(day);
-                      setPopupShowing(true);
-                    }}
-                  >
-                    <h1 className="calendar-event-title"> {event.title} </h1>
-                    <h1 className="calendar-event-time">
-                      {format(event.start_time, "hh:mm")}-
-                      {format(event.end_time, "hh:mm")}
-                    </h1>
-                  </div>
-                );
-              })}
-          </button>
-        ))}
+                  return matchingSpace ? matchingSpace.shown !== false : true;
+                })
+                .filter(
+                  (event) =>
+                    format(event.start_time, "yyyy-MM-dd") ===
+                    format(day, "yyyy-MM-dd")
+                )
+                .map((event, index) => {
+                  const startHour =
+                    new Date(event.start_time).getHours() +
+                    new Date(event.start_time).getMinutes() / 60;
+                  const endHour =
+                    new Date(event.end_time).getHours() +
+                    new Date(event.end_time).getMinutes() / 60;
+                  const top = startHour * pixelsPerHour;
+                  const height = (endHour - startHour) * pixelsPerHour;
+                  return (
+                    <div
+                      key={index}
+                      className="calendar-event"
+                      style={{
+                        top: `${top}px`,
+                        height: `${height}px`,
+                      }}
+                      onContextMenu={(e) => {
+                        if (showEditTodoPopup) {
+                          return;
+                        }
+                        setSelectedToDo(event);
+                        const x = e.clientX;
+                        const y = e.clientY;
+                        setPopupPosition({ x, y });
+                        setShowEditTodoPopup(true);
+                        setSelectedDay(day);
+                        setPopupShowing(true);
+                      }}
+                    >
+                      <h1 className="calendar-event-title"> {event.title} </h1>
+                      <h1 className="calendar-event-time">
+                        {format(event.start_time, "hh:mm")}-
+                        {format(event.end_time, "hh:mm")}
+                      </h1>
+                    </div>
+                  );
+                })}
+            </button>
+          ))}
+        </div>
+        <div className="calendar-week-hours-wrapper-right"></div>
       </div>
     </div>
   );
