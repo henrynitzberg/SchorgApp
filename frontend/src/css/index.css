@@ -18,6 +18,8 @@
   --light-gray: #A0A0A0;
   --yellow: #E3FF71;
   --blue: #70AAFF;
+  --light-gray-transparent: rgba(160, 160, 160, 0.75);
+  --light-gray-clear: rgba(160, 160, 160, 0);
   --gray-filter: brightness(0) saturate(100%) invert(11%) sepia(21%) saturate(13%) hue-rotate(46deg) brightness(98%) contrast(88%);
 }
 

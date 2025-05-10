@@ -93,13 +93,11 @@ export default function CalendarWeek({
     const todo = {
       title: newEventData.title,
       description: newEventData.description,
-      startDate: start_time,
-      endDate: end_time,
+      start_date: start_time,
+      end_date: end_time,
       start_time: start_time,
       end_time: end_time,
-      deliverable: newEventData.deliverable
-        ? newEventData.deliverable._id
-        : null,
+      deliverable: newEventData.deliverable,
       space: null,
     };
 
@@ -226,7 +224,9 @@ export default function CalendarWeek({
         <button className="switch-week-button-left" onClick={() => {
           setWeekStart(startOfWeek(addDays(weekStart, -7), { weekStartsOn: 7 }));
         }}>
-      <div className="arrow-left">prev</div>
+          <div className="arrow-left">
+            <img src="/last-month.svg" />
+          </div>
         </button>
         <div className="calendar-week-headers-wrapper">
           {days.map((day, index) => {
@@ -288,7 +288,10 @@ export default function CalendarWeek({
         <button className="switch-week-button-right" onClick={() => { 
           setWeekStart(startOfWeek(addDays(weekStart, 7), { weekStartsOn: 7 }));
         }}>
-          <div className="arrow-right">next</div>
+          <div className="arrow-right">
+            {/* right arrow image */}
+            <img src="/next-month.svg" alt="right arrow" />
+          </div>
         </button>
       </div>
 
@@ -385,7 +388,7 @@ export default function CalendarWeek({
                 })
                 .filter(
                   (event) =>
-                    format(event.start_time, "yyyy-MM-dd") ===
+                    format(event.start_date, "yyyy-MM-dd") ===
                     format(day, "yyyy-MM-dd")
                 )
                 .map((event, index) => {
@@ -426,6 +429,19 @@ export default function CalendarWeek({
                     </div>
                   );
                 })}
+              
+              {/* add any preview */}
+              {showTodoPopup && (format(day, "yyyy-MM-dd") == format(selectedDay, "yyyy-MM-dd")) && (
+                  <div
+                    className="calendar-event-preview"
+                    style={{
+                      top: `${(parseInt(initialStartTime.split(":")[0]) + (parseInt(initialStartTime.split(":")[1]) / 60)) * pixelsPerHour}px`,
+                      height: `${(initialDuration) * pixelsPerHour}px`,
+                    }}
+                  >
+                  </div>
+              )}
+
             </button>
           ))}
         </div>

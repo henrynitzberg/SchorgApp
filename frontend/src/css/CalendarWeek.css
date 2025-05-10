@@ -236,6 +236,9 @@
     border-top-right-radius: .25em;
     border-bottom-left-radius: .25em;
     border-bottom-right-radius: .25em;
+
+    user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
 }
 
 .switch-week-button-right {
@@ -260,3 +263,16 @@
     font-size: 12px;
     font-weight: 1000;
 }
+
+/* TODO: animate */
+.calendar-event-preview {
+    position: absolute;
+    left: 1%;
+    right: 1%;
+    padding: 0.25em 0.5em;
+    border-radius: 0.5em;
+    text-align: left;
+    overflow: hidden;
+    /* gradient from opacity 1 to 0 */
+    background: linear-gradient(to bottom, var(--light-gray-transparent) 0%, var(--light-gray-clear) 100%);
+  }
