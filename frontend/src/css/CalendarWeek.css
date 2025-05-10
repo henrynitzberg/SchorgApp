@@ -134,12 +134,12 @@
 
 .calendar-week-hours-wrapper {
     text-align: center;
-    width: 2em;
-    overflow-x: hidden;
+    width: 2.5em;
+    overflow-x: clip;
 }
 .calendar-week-hours-wrapper-right {
     text-align: center;
-    width: 2em;
+    width: 2.5em;
 }
 
 .calendar-week-day-body {
@@ -231,7 +231,7 @@
 }
 
 .switch-week-button-left {
-    width: 2em;
+    width: 2.5em;
     height: 100%;
     background-color: var(--red);
 
@@ -244,7 +244,7 @@
 }
 
 .switch-week-button-right {
-    width: 2em;
+    width: 2.5em;
     height: 100%;
     background-color: var(--red);
 
