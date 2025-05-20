@@ -97,7 +97,7 @@ export default function CalendarWeek({
       end_date: end_time,
       start_time: start_time,
       end_time: end_time,
-      deliverable: newEventData.deliverable,
+      deliverable: newEventData.deliverable ? newEventData.deliverable._id : null,
       space: null,
     };
 
@@ -121,7 +121,7 @@ export default function CalendarWeek({
       description: eventData.description,
       start_time,
       end_time,
-      deliverable: eventData.deliverable,
+      deliverable: eventData.deliverable._id,
       space: null,
       _id: id,
     };
@@ -138,7 +138,7 @@ export default function CalendarWeek({
             description: eventData.description,
             start_time,
             end_time,
-            deliverable: eventData.deliverable,
+            deliverable: eventData.deliverable._id,
           };
         }
         return todo;

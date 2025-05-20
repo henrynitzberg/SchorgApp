@@ -220,7 +220,10 @@ export default function ToDoForm({
             className="deliverable-select"
             defaultValue={
               editMode && eventData.deliverable
-                ? eventData.deliverable.title
+                ? deliverables.find(
+                    (deliverable) =>
+                      deliverable._id === eventData.deliverable
+                  ).title
                 : ""
             }
           >

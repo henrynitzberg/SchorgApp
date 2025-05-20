@@ -141,12 +141,11 @@ async function writeTodos(email, todos) {
         const db = client.db("Gage");
         const users = db.collection("Users");
 
-        console.log("todos:", todos);
+        console.log("writing todos: ", todos);
 
         todos = todos.map((todo) => {
             return {
                 ...todo,
-                deliverable: todo.deliverable ? ObjectId.createFromHexString(todo.deliverable) : null,
                 _id: new ObjectId(),
             }
         });
@@ -213,7 +212,7 @@ async function editTodo(email, todo) {
                 "todos.$.description": todo.description,
                 "todos.$.start_time": todo.start_time,
                 "todos.$.end_time": todo.end_time,
-                "todos.$.deliverable": todo.deliverable
+                "todos.$.deliverable": todo.deliverable 
             } }
         );
     }
