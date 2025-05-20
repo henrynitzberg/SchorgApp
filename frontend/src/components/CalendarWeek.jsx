@@ -119,9 +119,11 @@ export default function CalendarWeek({
     const todo_edit = {
       title: eventData.title,
       description: eventData.description,
-      start_time,
-      end_time,
-      deliverable: eventData.deliverable._id,
+      start_date: start_time,
+      end_date: end_time,
+      start_time: start_time,
+      end_time: end_time,
+      deliverable: eventData.deliverable ? eventData.deliverable._id : null,
       space: null,
       _id: id,
     };
@@ -136,9 +138,11 @@ export default function CalendarWeek({
             ...todo,
             title: eventData.title,
             description: eventData.description,
-            start_time,
-            end_time,
-            deliverable: eventData.deliverable._id,
+            start_date: start_time,
+            end_date: end_time,
+            start_time: start_time,
+            end_time: end_time,
+            deliverable: eventData.deliverable ? eventData.deliverable._id : null,
           };
         }
         return todo;

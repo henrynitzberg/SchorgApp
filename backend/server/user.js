@@ -210,7 +210,9 @@ async function editTodo(email, todo) {
             { $set: {
                 "todos.$.title": todo.title,
                 "todos.$.description": todo.description,
+                "todos.$.start_date": todo.start_time,
                 "todos.$.start_time": todo.start_time,
+                "todos.$.end_date": todo.end_time,
                 "todos.$.end_time": todo.end_time,
                 "todos.$.deliverable": todo.deliverable 
             } }
