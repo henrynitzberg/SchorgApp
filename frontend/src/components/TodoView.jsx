@@ -248,6 +248,8 @@ export default function TodoView({
     e.preventDefault();
     const lastStagedTodo = staged[staged.length - 1];
 
+    console.log("lastStagedTodo", lastStagedTodo);
+
     setSortedTasks((prev) => {
       const deliverableIndex = lastStagedTodo.deliverableIndex;
       const updatedTasks = [...prev];
@@ -258,6 +260,8 @@ export default function TodoView({
           description: lastStagedTodo.description,
           start_time: lastStagedTodo.start_time,
           end_time: lastStagedTodo.end_time,
+          start_date: lastStagedTodo.start_time,
+          end_date: lastStagedTodo.end_time,
           deliverable: lastStagedTodo.deliverable,
           space: lastStagedTodo.space,
           _id: lastStagedTodo._id,
@@ -285,6 +289,8 @@ export default function TodoView({
         title: lastStagedTodo.title,
         description: lastStagedTodo.description,
         start_time: lastStagedTodo.start_time,
+        start_date: lastStagedTodo.start_time,
+        end_date: lastStagedTodo.end_time,
         end_time: lastStagedTodo.end_time,
         deliverable: lastStagedTodo.deliverable,
         space: lastStagedTodo.space,

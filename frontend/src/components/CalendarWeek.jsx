@@ -393,7 +393,7 @@ export default function CalendarWeek({
                 .filter(
                   (event) =>
                     format(event.start_date, "yyyy-MM-dd") ===
-                    format(day, "yyyy-MM-dd")
+                    format(day, "yyyy-MM-dd") 
                 )
                 .map((event, index) => {
                   const startHour =
