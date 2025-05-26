@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import { fetchSpaceData } from "../crud.js";
+// import { fetchSpaceData } from "../crud.js";
 
 import axios from "axios";
 
@@ -28,11 +28,11 @@ export default function Gage() {
   const [selectedSpaceInfo, setSelectedSpaceInfo] = useState(null);
 
   async function openSpace(e, spaceId) {
-    const space = await fetchSpaceData(spaceId);
-    console.log("space:", space);
-    e.preventDefault();
-    setView("selected-space");
-    setSelectedSpaceInfo(space.data);
+    // const space = await fetchSpaceData(spaceId);
+    // console.log("space:", space);
+    // e.preventDefault();
+    // setView("selected-space");
+    // setSelectedSpaceInfo(space.data);
   }
 
   useEffect(() => {

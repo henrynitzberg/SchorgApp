@@ -1,14 +1,21 @@
-const cors = require("cors");
+const connectDB = require("./db");
+
+const mongoose = require("mongoose");
 const express = require("express");
+const cors = require("cors");
 const bodyParser = require("body-parser");
-const app = express();
+const bcrypt = require("bcrypt");
 
 const user = require("./user.js");
-// const space = require("./space.js");
-const bcrypt = require("bcrypt");
+const space = require("./space.js");
+
+const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Connect to MongoDB
+connectDB();
 
 app.post("/auth/standard-sign-up", async (req, res) => {
     const first_name = req.body.first_name;
@@ -181,37 +188,37 @@ app.post("/space/access", async (req, res) => {
     }
 })
 
-app.put("/user/update-todos", async (req, res) => {
+app.put("/user/write-todo", async (req, res) => {
     const email = req.body.email;
-    const newTodos = req.body.new_todos;
+    const newTodo = req.body.new_todo;
 
     try {
-        const newTodosWithId = await user.writeTodos(email, newTodos);
+        const newTodoWithId = await user.writeTodo(email, newTodo);
         
         return res.status(200).json({
-            message: "Successfully updated todos.",
-            new_todos_with_id: newTodosWithId
+            message: "Successfully updated todo.",
+            new_todo_with_id: newTodoWithId
         });
     }
     catch (err) {
         console.error(err);
-        return res.status(400).json({ message: "Failed to update todos." })
+        return res.status(400).json({ message: "Failed to update todo." })
     }
 })
 
-app.put("/user/remove-todos", async (req, res) => {
+app.put("/user/remove-todo", async (req, res) => {
     const email = req.body.email;
-    const removedTodoIds = req.body.removed_todo_ids;
+    const removedTodoId = req.body.removed_todo_id;
 
     try {
-        await user.removeTodos(email, removedTodoIds);
+        await user.removeTodo(email, removedTodoId);
         
         return res.status(200).json({
-            message: "Successfully removed todos."
+            message: "Successfully removed todo."
         });
     }
     catch (err) {
-        return res.status(400).json({ message: "Failed to update todos." })
+        return res.status(400).json({ message: "Failed to update todo." })
     }
 })
 
@@ -231,82 +238,82 @@ app.put("/user/edit-todo", async (req, res) => {
     }
 })
 
-app.put("/user/update-deliverables", async (req, res) => {
+app.put("/user/write-deliverable", async (req, res) => {
     const email = req.body.email;
-    const newDeliverables = req.body.new_deliverables;
+    const newDeliverable = req.body.new_deliverable;
 
     try {
-        const newDeliverablesWithId = await user.writeDeliverables(
-            email, newDeliverables
+        const newDeliverableWithId = await user.writeDeliverable(
+            email, newDeliverable
         );
         
         return res.status(200).json({
-            message: "Successfully updated user deliverables.",
-            new_deliverables_with_id: newDeliverablesWithId
+            message: "Successfully updated user deliverable.",
+            new_deliverable_with_id: newDeliverableWithId
         });
     }
     catch (err) {
         return res.status(400).json({
-            message: "Failed to update deliverables."
+            message: "Failed to update deliverable."
         })
     }
 })
 
-app.put("/user/toggle-space-display", async (req, res) => {
-    const email = req.body.email;
-    const spaceId = req.body.spaceId;
-    const shown = req.body.shown;
+// app.put("/user/toggle-space-display", async (req, res) => {
+//     const email = req.body.email;
+//     const spaceId = req.body.spaceId;
+//     const shown = req.body.shown;
 
-    try {
-        await user.toggleSpaceDisplay(email, spaceId, shown);
+//     try {
+//         await user.toggleSpaceDisplay(email, spaceId, shown);
 
-        return res.status(200).json({
-            message: "Successfully updated space display setting."
-        });
-    }
-    catch (err) {
-        return res.status(400).json({
-            message: "Failed to update space display setting."
-        })
-    }
-})
+//         return res.status(200).json({
+//             message: "Successfully updated space display setting."
+//         });
+//     }
+//     catch (err) {
+//         return res.status(400).json({
+//             message: "Failed to update space display setting."
+//         })
+//     }
+// })
 
-app.put("/user/update-spaces", async (req, res) => {
-    const email = req.body.email;
-    const newSpaces = req.body.new_spaces;
-    try {
-        await user.writeSpaces(email, newSpaces, shown);
+// app.put("/user/update-spaces", async (req, res) => {
+//     const email = req.body.email;
+//     const newSpaces = req.body.new_spaces;
+//     try {
+//         await user.writeSpaces(email, newSpaces, shown);
 
-        return res.status(200).json({
-            message: "Successfully updated user spaces."
-        });
-    }
-    catch (err) {
-        return res.status(400).json({ message: "Update failed." })
-    }
-})
+//         return res.status(200).json({
+//             message: "Successfully updated user spaces."
+//         });
+//     }
+//     catch (err) {
+//         return res.status(400).json({ message: "Update failed." })
+//     }
+// })
 
-app.put("/space/update-people", async (req, res) => {
-    const spaceId = req.body.spaceId;
-    const newPeople = req.body.new_people;
+// app.put("/space/update-people", async (req, res) => {
+//     const spaceId = req.body.spaceId;
+//     const newPeople = req.body.new_people;
 
-    console.log("request: ", spaceId, newPeople);
+//     console.log("request: ", spaceId, newPeople);
 
-    try {
-        await space.writePeople(spaceId, newPeople);
+//     try {
+//         await space.writePeople(spaceId, newPeople);
 
-        return res.status(200).json({
-            message: "Successfully updated space roster."
-        });
-    }
-    catch (err) {
-        return res.status(400).json({ message: "Update failed." })
-    }
-})
+//         return res.status(200).json({
+//             message: "Successfully updated space roster."
+//         });
+//     }
+//     catch (err) {
+//         return res.status(400).json({ message: "Update failed." })
+//     }
+// })
 
-app.put("/space/update-deliverables", (req, res) => {
-    const newDeliverables = req.body.new_deliverables;
-})
+// app.put("/space/update-deliverables", (req, res) => {
+//     const newDeliverables = req.body.new_deliverables;
+// })
 
 app.listen(8000, () => {
     console.log("Server Started on Port", 8000);

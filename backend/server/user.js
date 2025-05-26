@@ -1,43 +1,27 @@
-const { MongoClient } = require("mongodb");
-const ObjectId = require("mongodb").ObjectId;
+const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const space = require("./space");
+const User = require("./models/User");
+const Deliverable = require("./models/Deliverable");
+const Todo = require("./models/Todo");
+const Space = require("./models/Space");
 
-const dotenv = require("dotenv").config();
-const mongo_uri = process.env.MONGO_URI;
-
-const client = new MongoClient(mongo_uri);
+/* User Functions */
 
 async function getUser(email) {
     try {
-        await client.connect();
-
-        const db = client.db("Gage");
-        const users = db.collection("Users");
-
-        const user = await users.findOne({
-            email: email
-        });
-
-        return user;
-    }
-    catch (err) {
+        return await User.findOne({ email });
+    } catch (err) {
         console.error(err);
         throw err;
     }
 }
 
 async function registerUserStandard(first_name, last_name, email, password) {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
     try {
-        await client.connect();
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-        const db = client.db("Gage");
-        const users = db.collection("Users");
-
-        await users.insertOne({
+        const newUser = new User({
             first_name: first_name,
             last_name: last_name,
             email: email,
@@ -48,21 +32,18 @@ async function registerUserStandard(first_name, last_name, email, password) {
             is_google: false
         });
 
+        await newUser.save();
         return await getUser(email);
     }
     catch (err) {
+        console.error(err);
         throw err;
     }
 }
 
 async function registerUserGoogle(first_name, last_name, email) {
     try {
-        await client.connect();
-
-        const db = client.db("Gage");
-        const users = db.collection("Users");
-
-        await users.insertOne({
+        const newUser = new User({
             first_name: first_name,
             last_name: last_name,
             email: email,
@@ -73,122 +54,8 @@ async function registerUserGoogle(first_name, last_name, email) {
             is_google: true
         });
 
+        await newUser.save();
         return await getUser(email);
-    }
-    catch (err) {
-        throw err;
-    }
-}
-
-async function toggleSpaceDisplay(email, spaceId, shown) {
-    try {
-        await client.connect();
-
-        const db = client.db("Gage");
-        const users = db.collection("Users");
-
-        await users.updateOne(
-            { 
-                email: email, 
-                "user_spaces._id": ObjectId.createFromHexString(spaceId) 
-            },
-            { 
-                $set: { 
-                    "user_spaces.$.shown": shown 
-                } 
-            }
-        );
-    }
-    catch (err) {
-        throw err;
-    }
-}
-
-async function writeDeliverables(email, deliverables) {
-    try {
-        await client.connect();
-
-        const db = client.db("Gage");
-        const users = db.collection("Users");
-
-        deliverables = deliverables.map((deliverable) => {
-            return {
-                ...deliverable,
-                _id: new ObjectId(),
-            }
-        })
-
-        await users.updateOne(
-            { email: email },
-            { $push: {
-                user_deliverables: {
-                    $each: deliverables
-                }
-            } }
-        );
-
-        return deliverables;
-    }
-    catch (err) {
-        throw err;
-    }
-}
-
-async function writeTodos(email, todos) {
-    try {
-        await client.connect();
-
-        const db = client.db("Gage");
-        const users = db.collection("Users");
-
-        console.log("writing todos: ", todos);
-
-        todos = todos.map((todo) => {
-            return {
-                ...todo,
-                _id: new ObjectId(),
-            }
-        });
-
-        await users.updateOne(
-            { email: email },
-            { $push: {
-                todos: {
-                    $each: todos
-                }
-            } }
-        );
-
-        return todos;
-    }
-    catch (err) {
-        throw err;
-    }
-}
-
-async function removeTodos(email, todo_ids) {
-    try {
-        await client.connect();
-
-        const db = client.db("Gage");
-        const users = db.collection("Users");
-
-        console.log("removing: ", todo_ids);
-
-        const ids = todo_ids.map((todo_id) => {
-            return ObjectId.createFromHexString(todo_id);
-        });
-
-        await users.updateOne(
-            { email: email },
-            { $pull: {
-                todos: {
-                    _id: {
-                        $in: ids
-                    }
-                }
-            } }
-        );
     }
     catch (err) {
         console.error(err);
@@ -196,64 +63,138 @@ async function removeTodos(email, todo_ids) {
     }
 }
 
-async function editTodo(email, todo) {
+/* TODO FUNCTIONS */
+
+async function writeTodo(email, todo) {
     try {
-        await client.connect();
+        console.log("writing todo: ", todo);
 
-        const db = client.db("Gage");
-        const users = db.collection("Users");
+        todo_with_id = {
+            ...todo,
+            _id: new mongoose.Types.ObjectId(),
+        };
 
-        console.log("editing todo: ", todo);
-
-        await users.updateOne(
-            { email: email, "todos._id": ObjectId.createFromHexString(todo._id) },
-            { $set: {
-                "todos.$.title": todo.title,
-                "todos.$.description": todo.description,
-                "todos.$.start_date": todo.start_time,
-                "todos.$.start_time": todo.start_time,
-                "todos.$.end_date": todo.end_time,
-                "todos.$.end_time": todo.end_time,
-                "todos.$.deliverable": todo.deliverable 
-            } }
+        await User.findOneAndUpdate(
+            { email },
+            { $push: { todos: todo_with_id } },
+            { new: true }
         );
+
+        return todo_with_id;
     }
     catch (err) {
+        console.error(err);
         throw err;
     }
 }
 
-async function writeSpaces(email, spaces) {
+async function removeTodo(email, todo_id) {
     try {
-        await client.connect();
+        const user = await User.findOne({ email });
+        if (!user) throw new Error("User not found");
 
-        const db = client.db("Gage");
-        const users = db.collection("Users");
+        console.log("removing todo with id: ", todo_id);
 
-        await users.updateOne(
-            { email: email },
-            { $push: {
-                user_spaces: {
-                    $each: spaces
-                }
-            } }
-        );
-
-        console.log("it")
+        user.todos = user.todos.filter(todo => (!todo_id == todo._id.toString()));
+        await user.save();
     }
     catch (err) {
+        console.error(err);
         throw err;
     }
 }
+
+async function editTodo(email, updatedTodo) {
+    try {
+        const user = await User.findOne({ email });
+        if (!user) throw new Error("User not found");
+
+        console.log("editing todo: ", updatedTodo);
+
+        const todo = user.todos.id(updatedTodo._id);
+        if (!todo) throw new Error("Todo not found");
+
+        Object.assign(todo, updatedTodo);
+        await user.save();
+    }
+    catch (err) {
+        console.error(err);
+        throw err;
+    }
+}
+
+/* DELIVERABLE FUNCTIONS */
+
+async function writeDeliverable(email, deliverable) {
+    try {
+        console.log("writing deliverable: ", deliverable);
+
+        deliverable_with_id = {
+            ...deliverable,
+            _id: new mongoose.Types.ObjectId(),
+        };
+
+        await User.findOneAndUpdate(
+            { email },
+            { $push: { user_deliverables: deliverable_with_id } },
+            { new: true }
+        );
+
+        return deliverable_with_id;
+    }
+    catch (err) {
+        console.error(err);
+        throw err;
+    }
+}
+
+/* SPACE FUNCTIONS */
+
+// async function writeSpace(email, space) {
+//     try {
+//     }
+//     catch (err) {
+//         console.error(err);
+//         throw err;
+//     }
+// }
+
+// TODO: should probably be a part of settings, which doesn't exist yet...
+// async function toggleSpaceDisplay(email, spaceId, shown) {
+//     try {
+//         await client.connect();
+
+//         const db = client.db("Gage");
+//         const users = db.collection("Users");
+
+//         await users.updateOne(
+//             { 
+//                 email: email, 
+//                 "user_spaces._id": ObjectId.createFromHexString(spaceId) 
+//             },
+//             { 
+//                 $set: { 
+//                     "user_spaces.$.shown": shown 
+//                 } 
+//             }
+//         );
+//     }
+//     catch (err) {
+//        console.error(err);
+//         throw err;
+//     }
+// }
+
+/* exports */
 
 module.exports = {
     getUser: getUser,
     registerUserStandard: registerUserStandard,
     registerUserGoogle: registerUserGoogle,
-    writeDeliverables: writeDeliverables,
-    writeTodos: writeTodos,
-    removeTodos: removeTodos,
+    writeDeliverable: writeDeliverable,
+    writeTodo: writeTodo,
+    removeTodo: removeTodo,
     editTodo: editTodo,
-    writeSpaces: writeSpaces,
-    toggleSpaceDisplay: toggleSpaceDisplay
+    // writeSpaces: writeSpaces,
+    // toggleSpaceDisplay: toggleSpaceDisplay
 }

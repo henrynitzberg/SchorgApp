@@ -5,7 +5,7 @@ import DatePickerPopUp from "./DatePickerPopUp.jsx";
 
 import "../css/TodoView.css";
 import "../css/ReactCalendar.css";
-import { editTodo, updateTodos, removeTodos } from "../crud";
+import { editTodo, writeTodo, removeTodo } from "../crud";
 
 export default function TodoView({
   user,
@@ -90,7 +90,7 @@ export default function TodoView({
           );
 
           try {
-            await removeTodos(user.email, [stagedTodo._id]);
+            await removeTodo(user.email, stagedTodo._id);
 
             setUserTodos((prev) =>
               prev.filter((todo) => todo._id !== stagedTodo._id)
@@ -133,8 +133,8 @@ export default function TodoView({
     const newTodo = {
       title: newTitle,
       description: toEditTodo.description,
-      start_time: toEditTodo.start_time,
-      end_time: toEditTodo.end_time,
+      dates: { start: toEditTodo.times.start, end: toEditTodo.times.end },
+      times: { start: toEditTodo.times.start, end: toEditTodo.times.end },
       deliverable: toEditTodo.deliverable,
       space: toEditTodo.space,
       _id: toEditTodo._id,
@@ -258,10 +258,14 @@ export default function TodoView({
         {
           title: lastStagedTodo.title,
           description: lastStagedTodo.description,
-          start_time: lastStagedTodo.start_time,
-          start_date: lastStagedTodo.start_time,
-          end_time: lastStagedTodo.end_time,
-          end_date: lastStagedTodo.end_time,
+          dates: {
+            start: lastStagedTodo.times.start,
+            end: lastStagedTodo.times.end,
+          },
+          times: {
+            start: lastStagedTodo.times.start,
+            end: lastStagedTodo.times.end,
+          },
           deliverable: lastStagedTodo.deliverable,
           space: lastStagedTodo.space,
           _id: lastStagedTodo._id,
@@ -272,7 +276,7 @@ export default function TodoView({
       ];
 
       updatedTodos.sort(
-        (a, b) => new Date(a.start_time) - new Date(b.start_time)
+        (a, b) => new Date(a.times.start) - new Date(b.times.start)
       );
 
       updatedTasks[deliverableIndex] = {
@@ -288,10 +292,14 @@ export default function TodoView({
       {
         title: lastStagedTodo.title,
         description: lastStagedTodo.description,
-        start_time: lastStagedTodo.start_time,
-        start_date: lastStagedTodo.start_time,
-        end_date: lastStagedTodo.end_time,
-        end_time: lastStagedTodo.end_time,
+        dates: {
+          start: lastStagedTodo.times.start,
+          end: lastStagedTodo.times.end,
+        },
+        times: {
+          start: lastStagedTodo.times.start,
+          end: lastStagedTodo.times.end,
+        },
         deliverable: lastStagedTodo.deliverable,
         space: lastStagedTodo.space,
         _id: lastStagedTodo._id,
@@ -299,25 +307,27 @@ export default function TodoView({
     ];
 
     //   newUserTodos.sort(
-    //     (a, b) => new Date(a.start_time) - new Date(b.start_time)
+    //     (a, b) => new Date(a.times.start) - new Date(b.times.start)
     //   );
 
     setUserTodos(newUserTodos);
 
     try {
-      await updateTodos(user.email, [
-        {
-          title: lastStagedTodo.title,
-          description: lastStagedTodo.description,
-          start_time: lastStagedTodo.start_time,
-          start_date: lastStagedTodo.start_time,
-          end_time: lastStagedTodo.end_time,
-          end_date: lastStagedTodo.end_time,
-          deliverable: lastStagedTodo.deliverable,
-          space: lastStagedTodo.space,
-          _id: lastStagedTodo._id,
+      await writeTodo(user.email, {
+        title: lastStagedTodo.title,
+        description: lastStagedTodo.description,
+        dates: {
+          start: lastStagedTodo.times.start,
+          end: lastStagedTodo.times.end,
         },
-      ]);
+        times: {
+          start: lastStagedTodo.times.start,
+          end: lastStagedTodo.times.end,
+        },
+        deliverable: lastStagedTodo.deliverable,
+        space: lastStagedTodo.space,
+        _id: lastStagedTodo._id,
+      });
     } catch (err) {
       console.error(err);
     }
@@ -338,8 +348,8 @@ export default function TodoView({
     const newTodo = {
       title: "",
       description: "",
-      start_time: null,
-      end_time: null,
+      dates: null,
+      times: null,
       deliverable: sortedTasks[deliverableIndex]._id,
       space: null,
       readOnly: false,
@@ -399,15 +409,18 @@ export default function TodoView({
     const newTodo = {
       title: newTitle,
       description: toEditTodo.description,
-      start_time: toEditTodo.start_time,
-      end_time: toEditTodo.end_time,
+      dates: { start: toEditTodo.times.start, end: toEditTodo.times.end },
+      times: {
+        start: toEditTodo.times.start,
+        end: toEditTodo.times.end,
+      },
       deliverable: toEditTodo.deliverable,
       space: toEditTodo.space,
       _id: toEditTodo._id,
     };
 
     try {
-      const newTodosWithId = await updateTodos(user.email, [newTodo]);
+      const newTodosWithId = await writeTodo(user.email, newTodo);
       setSortedTasks((prev) =>
         prev.map((deliverable, di) => {
           if (di !== deliverableIndex) return deliverable;
@@ -496,7 +509,7 @@ export default function TodoView({
         });
 
         const sortedTodos = updatedTodos.sort((a, b) => {
-          return new Date(a.start_time) - new Date(b.start_time);
+          return new Date(a.times.start) - new Date(b.times.start);
         });
 
         return {
@@ -515,8 +528,14 @@ export default function TodoView({
     const newTodo = {
       title: toEditTodo.title,
       description: toEditTodo.description,
-      start_time: isoDate,
-      end_time: toEditTodo.end_time,
+      dates: {
+        start: isoDate,
+        end: toEditTodo.times.end,
+      },
+      times: {
+        start: isoDate,
+        end: toEditTodo.times.end,
+      },
       deliverable: toEditTodo.deliverable,
       space: toEditTodo.space,
       _id: toEditTodo._id,
@@ -536,7 +555,7 @@ export default function TodoView({
           if (j !== todoIndex) return todo;
           return {
             ...todo,
-            start_time: isoDate,
+            times: {start: isoDate, end: todo.times.end},
           };
         });
 
@@ -576,7 +595,7 @@ export default function TodoView({
 
     deliverablesWithTodos.forEach((deliverable) => {
       deliverable.todos.sort(
-        (a, b) => new Date(a.start_time) - new Date(b.start_time)
+        (a, b) => new Date(a.times.start) - new Date(b.times.start)
       );
     });
 
@@ -730,9 +749,9 @@ export default function TodoView({
                                     className="todo-view-deliverable-todo-start-date-icon"
                                   />
                                   <p className="todo-view-deliverable-todo-start-date-text">
-                                    {todo.start_time
+                                    {todo.times.start
                                       ? new Date(
-                                          todo.start_time
+                                          todo.times.start
                                         ).toLocaleString("en-US", {
                                           month: "short",
                                           day: "numeric",
@@ -747,8 +766,8 @@ export default function TodoView({
                                 {todo.editDate && (
                                   <DatePickerPopUp
                                     value={
-                                      todo.start_time
-                                        ? new Date(todo.start_time)
+                                      todo.times.start
+                                        ? new Date(todo.times.start)
                                         : null
                                     }
                                     onChange={async (date) =>
@@ -851,7 +870,7 @@ export default function TodoView({
         </div>
       )}
       {/* <DatePickerPopUp
-        // value={todo.start_time ? new Date(todo.start_time) : null}
+        // value={todo.times.start ? new Date(todo.times.start) : null}
         value={new Date()}
         onChange={async (date) => await writeChangeDate(date, i, index)}
       /> */}

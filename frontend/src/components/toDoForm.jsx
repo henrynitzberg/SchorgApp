@@ -17,10 +17,10 @@ export default function ToDoForm({
   const popupRef = useRef(null);
 
   const startTime = editMode
-    ? format(eventData.start_time, "HH:mm")
+    ? format(eventData.times.start, "HH:mm")
     : initialStartTime;
   const endTime = editMode
-    ? format(eventData.end_time, "HH:mm")
+    ? format(eventData.times.end, "HH:mm")
     : initialEndTime;
 
   useEffect(() => {

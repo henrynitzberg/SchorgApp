@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { startOfWeek, addDays, format, set } from "date-fns";
 import ToDoForm from "./toDoForm.jsx";
 import {
-  updateUserDeliverables,
-  updateTodos,
-  removeTodos,
+  writeTodo,
+  removeTodo,
   editTodo,
+  writeUserDeliverable,
 } from "../crud.js";
 
 import "../css/CalendarWeek.css";
@@ -60,17 +60,18 @@ export default function CalendarWeek({
       title: newEventData.title,
       description: newEventData.description,
       due_date: due_date,
-      time_worked: 0,
+      minutes_worked: 0,
       space: null,
       space_deliverable: null,
     };
 
     try {
-      const newDeliverablesWithId = await updateUserDeliverables(user.email, [
-        deliverable,
-      ]);
+      const newDeliverableWithId = await writeUserDeliverable(
+        user.email,
+        deliverable
+      );
 
-      setUserDeliverables((prev) => [...prev, ...newDeliverablesWithId]);
+      setUserDeliverables((prev) => [...prev, newDeliverableWithId]);
     } catch (err) {
       console.error(err);
     }
@@ -98,10 +99,8 @@ export default function CalendarWeek({
     const todo = {
       title: newEventData.title,
       description: newEventData.description,
-      start_date: start_time,
-      end_date: end_time,
-      start_time: start_time,
-      end_time: end_time,
+      dates: { start: start_time, end: end_time },
+      times: { start: start_time, end: end_time },
       deliverable: newEventData.deliverable
         ? newEventData.deliverable._id
         : null,
@@ -110,8 +109,8 @@ export default function CalendarWeek({
 
     console.log("Saving new todo: ", todo);
     try {
-      const newTodosWithId = await updateTodos(user.email, [todo]);
-      setUserTodos((prev) => [...prev, ...newTodosWithId]);
+      const newTodoWithId = await writeTodo(user.email, todo);
+      setUserTodos((prev) => [...prev, newTodoWithId]);
       console.log(userTodos);
     } catch (err) {
       console.error(err);
@@ -126,10 +125,8 @@ export default function CalendarWeek({
     const todo_edit = {
       title: eventData.title,
       description: eventData.description,
-      start_date: start_time,
-      end_date: end_time,
-      start_time: start_time,
-      end_time: end_time,
+      dates: { start: start_time, end: end_time },
+      times: { start: start_time, end: end_time },
       deliverable: eventData.deliverable ? eventData.deliverable._id : null,
       space: null,
       _id: id,
@@ -145,10 +142,8 @@ export default function CalendarWeek({
             ...todo,
             title: eventData.title,
             description: eventData.description,
-            start_date: start_time,
-            end_date: end_time,
-            start_time: start_time,
-            end_time: end_time,
+            dates: { start: start_time, end: end_time },
+            times: { start: start_time, end: end_time },
             deliverable: eventData.deliverable
               ? eventData.deliverable._id
               : null,
@@ -162,13 +157,12 @@ export default function CalendarWeek({
   const handleRemoveToDo = (e) => {
     console.log("removing todo: ", e);
     const id = e._id;
-    removeTodos(user.email, [id]);
+    removeTodo(user.email, id);
     setUserTodos((prev) => prev.filter((todo) => todo._id !== id));
   };
 
   const handleTodoDrop = (e, day) => {
     const todo = selectedToDo;
-    console.log("dropped todo: ", todo);
 
     // get hour and minutes from drop position
     const x = e.clientX;
@@ -186,19 +180,19 @@ export default function CalendarWeek({
       hours: hour,
       minutes: minutes,
     });
-    const startTime = new Date(todo.start_time);
-    const endTime = new Date(todo.end_time);
+    const startTime = new Date(todo.times.start);
+    const endTime = new Date(todo.times.end);
     const todoDuration = endTime.getTime() - startTime.getTime();
 
     const newEndTime = new Date(newStartTime.getTime() + todoDuration);
 
     const editedTodo = {
       ...todo,
-      start_date: newStartTime,
-      end_date: newEndTime,
-      start_time: newStartTime,
-      end_time: newEndTime,
+      dates: { start: newStartTime, end: newEndTime },
+      times: { start: newStartTime, end: newEndTime },
     };
+
+    console.log("editing todo after drop: ", editedTodo);
 
     const id = editedTodo._id;
 
@@ -208,10 +202,8 @@ export default function CalendarWeek({
         if (todo._id === id) {
           return {
             ...todo,
-            start_date: newStartTime,
-            end_date: newEndTime,
-            start_time: newStartTime,
-            end_time: newEndTime,
+            dates: { start: newStartTime, end: newEndTime },
+            times: { start: newStartTime, end: newEndTime },
           };
         }
         return todo;
@@ -326,7 +318,7 @@ export default function CalendarWeek({
                   const windowWidth = window.innerWidth;
 
                   if (popup_left + 225 > windowWidth) {
-                    popup_left = rect.x - 225 + popupPadding; 
+                    popup_left = rect.x - 225 + popupPadding;
                   }
 
                   setPopupPosition({ x: popup_left, y: y });
@@ -409,17 +401,17 @@ export default function CalendarWeek({
                   return;
                 }
 
-                // TODO: in all places where popup location is set, the width 
+                // TODO: in all places where popup location is set, the width
                 // of the popup (200, here) is hardcoded. Don't do this.
                 const popupPadding = 10;
-                
+
                 const y = e.clientY;
                 const rect = e.currentTarget.getBoundingClientRect();
                 let popup_left = rect.x + rect.width - popupPadding;
                 const windowWidth = window.innerWidth;
 
                 if (popup_left + 200 > windowWidth) {
-                  popup_left = rect.x - 200 + popupPadding; 
+                  popup_left = rect.x - 200 + popupPadding;
                 }
 
                 setPopupPosition({ x: popup_left, y: y });
@@ -518,17 +510,17 @@ export default function CalendarWeek({
                 })
                 .filter(
                   (event) =>
-                    event.start_date &&
-                    format(event.start_date, "yyyy-MM-dd") ===
+                    event.times.start &&
+                    format(event.times.start, "yyyy-MM-dd") ===
                       format(day, "yyyy-MM-dd")
                 )
                 .map((event, index) => {
                   const startHour =
-                    new Date(event.start_time).getHours() +
-                    new Date(event.start_time).getMinutes() / 60;
+                    new Date(event.times.start).getHours() +
+                    new Date(event.times.start).getMinutes() / 60;
                   const endHour =
-                    new Date(event.end_time).getHours() +
-                    new Date(event.end_time).getMinutes() / 60;
+                    new Date(event.times.end).getHours() +
+                    new Date(event.times.end).getMinutes() / 60;
                   const top = startHour * pixelsPerHour;
                   const height = (endHour - startHour) * pixelsPerHour;
                   return (
@@ -553,7 +545,7 @@ export default function CalendarWeek({
                         const windowWidth = window.innerWidth;
 
                         if (popup_left + 200 > windowWidth) {
-                          popup_left = rect.x - 200 + popupPadding; 
+                          popup_left = rect.x - 200 + popupPadding;
                         }
 
                         setPopupPosition({ x: popup_left, y });
@@ -575,14 +567,14 @@ export default function CalendarWeek({
                     >
                       <h1 className="calendar-event-title"> {event.title} </h1>
                       <h1 className="calendar-event-time">
-                        {format(event.start_time, "HH:mm")}-
-                        {format(event.end_time, "HH:mm")}
+                        {format(event.times.start, "HH:mm")}-
+                        {format(event.times.end, "HH:mm")}
                       </h1>
                     </div>
                   );
                 })}
 
-              {/* add any preview */}
+              {/* add event preview */}
               {(showTodoPopup || showCalendarEventPreview) &&
                 format(day, "yyyy-MM-dd") ==
                   format(selectedDay, "yyyy-MM-dd") && (

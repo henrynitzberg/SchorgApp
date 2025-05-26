@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 import AddSpacePopUp from "./AddSpacePopUp.jsx";
-import { toggleSpaceDisplay } from "../crud.js";
+// import { toggleSpaceDisplay } from "../crud.js";
 
 import "../css/Sidebar.css";
 
