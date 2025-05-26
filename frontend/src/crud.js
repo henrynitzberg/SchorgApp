@@ -36,10 +36,10 @@ export async function writeTodo(email, todo) {
 
 export async function removeTodo(email, todo_id) {
     try {
-        console.log("removing todo: ", todo_ids);
+        console.log("removing todo: ", todo_id);
         await axios.put(APP_URL + "/user/remove-todo", {
             email: email,
-            removed_todo_ids: todo_id
+            removed_todo_id: todo_id
         });
     } catch (err) {
         throw err;

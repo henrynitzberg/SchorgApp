@@ -95,7 +95,7 @@ async function removeTodo(email, todo_id) {
 
         console.log("removing todo with id: ", todo_id);
 
-        user.todos = user.todos.filter(todo => (!todo_id == todo._id.toString()));
+        user.todos = user.todos.filter(todo => !(todo_id == todo._id.toString()));
         await user.save();
     }
     catch (err) {
