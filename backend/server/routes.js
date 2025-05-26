@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const app = express();
 
 const user = require("./user.js");
-const space = require("./space.js");
+// const space = require("./space.js");
 const bcrypt = require("bcrypt");
 
 app.use(cors());

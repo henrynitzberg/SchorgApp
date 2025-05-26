@@ -569,6 +569,7 @@ export default function CalendarWeek({
                         e.dataTransfer.setDragImage(noImage, 0, 0);
                       }}
                       onDragEnd={(e) => {
+                        setShowCalendarEventPreview(false);
                         e.preventDefault();
                       }}
                     >

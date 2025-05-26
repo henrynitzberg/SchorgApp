@@ -70,6 +70,16 @@ export async function updateUserDeliverables(email, deliverables) {
 }
 
 export async function updateTodos(email, todos) {
+    // title
+    // description
+    // start date
+    // end date
+    // start time
+    // end time
+    // deliverable
+    // space
+    // color
+
     try {
         const response = await axios.put(APP_URL + "/user/update-todos", {
             email: email,
