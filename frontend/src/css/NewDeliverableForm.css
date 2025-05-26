@@ -4,7 +4,7 @@
     position: fixed;
 
     width: 225px;
-    /* height: 200px; */
+
     background-color: var(--back3);
     color: black;
     padding-top: .5em;
@@ -26,14 +26,20 @@
     width: 1.5em;
     height: 1.5em;
     border-radius: .5em;
-    background-color: var(--back5);
     text-align: center;
     align-items: center;
     color: var(--text-gray);
     
     border: 1px solid var(--text-gray);
     cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+.deliverable-popup-X-button-wrapper:hover {
+    transition: background-color 0.2s ease, color 0.2s ease;
+    color: white;
+    border: 1px solid white;
+  }
 
 .deliverable-popup-title {
     font-size: 1.2em;
@@ -100,3 +106,9 @@
     border: 1px solid var(--text-gray);
     cursor: pointer;
 }
+
+.deliverable-popup-button:hover {
+    color: white;
+    border: 1px solid white;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }

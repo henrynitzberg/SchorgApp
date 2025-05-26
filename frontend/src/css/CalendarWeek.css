@@ -173,6 +173,9 @@
     flex-direction: column;
     text-align: left;
     padding-left: .5em;
+
+    user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
 }
 
 .calendar-event-title {

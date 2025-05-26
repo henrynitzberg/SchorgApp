@@ -26,14 +26,12 @@
     width: 1.5em;
     height: 1.5em;
     border-radius: .5em;
-    /* background-color: var(--back4); */
     text-align: center;
     align-items: center;
     color: var(--text-gray);
     
     border: 1px solid var(--text-gray);
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .todo-popup-X-button-wrapper:hover {
@@ -181,11 +179,11 @@
     
     border: 1px solid var(--text-gray);
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .todo-popup-button:hover {
   color: white;
   border: 1px solid white;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 

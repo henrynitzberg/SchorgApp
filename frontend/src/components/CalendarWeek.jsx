@@ -31,6 +31,11 @@ export default function CalendarWeek({
   const [showDeliverablePopup, setShowDeliverablePopup] = useState(false);
   const [showTodoPopup, setShowTodoPopup] = useState(false);
   const [showEditTodoPopup, setShowEditTodoPopup] = useState(false);
+  const noImage = new Image();
+  noImage.src = "/no-image.svg";
+
+  const [showCalendarEventPreview, setShowCalendarEventPreview] =
+    useState(false);
 
   const [selectedDay, setSelectedDay] = useState(null); // For assigning event to day
   const [selectedToDo, setSelectedToDo] = useState(null); // For editing todo
@@ -97,7 +102,9 @@ export default function CalendarWeek({
       end_date: end_time,
       start_time: start_time,
       end_time: end_time,
-      deliverable: newEventData.deliverable ? newEventData.deliverable._id : null,
+      deliverable: newEventData.deliverable
+        ? newEventData.deliverable._id
+        : null,
       space: null,
     };
 
@@ -142,7 +149,9 @@ export default function CalendarWeek({
             end_date: end_time,
             start_time: start_time,
             end_time: end_time,
-            deliverable: eventData.deliverable ? eventData.deliverable._id : null,
+            deliverable: eventData.deliverable
+              ? eventData.deliverable._id
+              : null,
           };
         }
         return todo;
@@ -157,7 +166,62 @@ export default function CalendarWeek({
     setUserTodos((prev) => prev.filter((todo) => todo._id !== id));
   };
 
-  const [weekStart, setWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 7 })); // Sunday
+  const handleTodoDrop = (e, day) => {
+    const todo = selectedToDo;
+    console.log("dropped todo: ", todo);
+
+    // get hour and minutes from drop position
+    const x = e.clientX;
+    const y = e.clientY;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickedHour = (y - rect.top) / pixelsPerHour;
+    const hour = Math.floor(clickedHour);
+    // round to nearest 15 minutes
+    let minutes = Math.round(Math.round((clickedHour - hour) * 60) / 15) * 15;
+
+    if (minutes === 60) {
+      minutes = 45;
+    }
+    const newStartTime = set(day, {
+      hours: hour,
+      minutes: minutes,
+    });
+    const startTime = new Date(todo.start_time);
+    const endTime = new Date(todo.end_time);
+    const todoDuration = endTime.getTime() - startTime.getTime();
+
+    const newEndTime = new Date(newStartTime.getTime() + todoDuration);
+
+    const editedTodo = {
+      ...todo,
+      start_date: newStartTime,
+      end_date: newEndTime,
+      start_time: newStartTime,
+      end_time: newEndTime,
+    };
+
+    const id = editedTodo._id;
+
+    editTodo(user.email, editedTodo);
+    setUserTodos((prev) =>
+      prev.map((todo) => {
+        if (todo._id === id) {
+          return {
+            ...todo,
+            start_date: newStartTime,
+            end_date: newEndTime,
+            start_time: newStartTime,
+            end_time: newEndTime,
+          };
+        }
+        return todo;
+      })
+    );
+  };
+
+  const [weekStart, setWeekStart] = useState(
+    startOfWeek(startDate, { weekStartsOn: 7 })
+  ); // Sunday
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   const scrollRef = useRef(null);
@@ -225,9 +289,14 @@ export default function CalendarWeek({
         />
       )}
       <div className="calendar-week-header-wrapper">
-        <button className="switch-week-button-left" onClick={() => {
-          setWeekStart(startOfWeek(addDays(weekStart, -7), { weekStartsOn: 7 }));
-        }}>
+        <button
+          className="switch-week-button-left"
+          onClick={() => {
+            setWeekStart(
+              startOfWeek(addDays(weekStart, -7), { weekStartsOn: 7 })
+            );
+          }}
+        >
           <div className="arrow-left">
             <img src="/last-month.svg" />
           </div>
@@ -249,9 +318,18 @@ export default function CalendarWeek({
                     return;
                   }
 
-                  const x = e.clientX;
+                  const popupPadding = 10;
+
                   const y = e.clientY;
-                  setPopupPosition({ x, y });
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  let popup_left = rect.x + rect.width - popupPadding;
+                  const windowWidth = window.innerWidth;
+
+                  if (popup_left + 225 > windowWidth) {
+                    popup_left = rect.x - 225 + popupPadding; 
+                  }
+
+                  setPopupPosition({ x: popup_left, y: y });
                   setSelectedDay(day);
                   setShowDeliverablePopup(true);
                   setPopupShowing(true);
@@ -266,7 +344,9 @@ export default function CalendarWeek({
                       const matchingSpace = userSpaces.find(
                         (space) => space._id === todo.space
                       );
-                      return matchingSpace ? matchingSpace.shown !== false : true;
+                      return matchingSpace
+                        ? matchingSpace.shown !== false
+                        : true;
                     })
                     .filter(
                       (event) =>
@@ -276,7 +356,9 @@ export default function CalendarWeek({
                     .slice(0, 4)
                     .map((event, index) => {
                       return (
-                        (index < 3 && <div key={index} className="dot"></div>) ||
+                        (index < 3 && (
+                          <div key={index} className="dot"></div>
+                        )) ||
                         (index === 3 && (
                           <div key={index} className="header-ellipses">
                             ...
@@ -289,9 +371,14 @@ export default function CalendarWeek({
             );
           })}
         </div>
-        <button className="switch-week-button-right" onClick={() => { 
-          setWeekStart(startOfWeek(addDays(weekStart, 7), { weekStartsOn: 7 }));
-        }}>
+        <button
+          className="switch-week-button-right"
+          onClick={() => {
+            setWeekStart(
+              startOfWeek(addDays(weekStart, 7), { weekStartsOn: 7 })
+            );
+          }}
+        >
           <div className="arrow-right">
             {/* right arrow image */}
             <img src="/next-month.svg" alt="right arrow" />
@@ -322,18 +409,29 @@ export default function CalendarWeek({
                   return;
                 }
 
-                const x = e.clientX;
+                // TODO: in all places where popup location is set, the width 
+                // of the popup (200, here) is hardcoded. Don't do this.
+                const popupPadding = 10;
+                
                 const y = e.clientY;
-                setPopupPosition({ x, y });
+                const rect = e.currentTarget.getBoundingClientRect();
+                let popup_left = rect.x + rect.width - popupPadding;
+                const windowWidth = window.innerWidth;
+
+                if (popup_left + 200 > windowWidth) {
+                  popup_left = rect.x - 200 + popupPadding; 
+                }
+
+                setPopupPosition({ x: popup_left, y: y });
+
                 setSelectedDay(day);
 
-                const rect = e.currentTarget.getBoundingClientRect();
                 const clickedHour = (y - rect.top) / pixelsPerHour;
                 const hour = Math.floor(clickedHour);
                 // round to nearest 15 minutes
                 let minutes =
                   Math.round(Math.round((clickedHour - hour) * 60) / 15) * 15;
-                
+
                 if (minutes === 60) {
                   minutes = 45;
                 }
@@ -353,6 +451,33 @@ export default function CalendarWeek({
                 setShowTodoPopup(true);
                 setPopupShowing(true);
               }}
+              onDragOver={(e) => {
+                setShowCalendarEventPreview(true);
+
+                const y = e.clientY;
+
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clickedHour = (y - rect.top) / pixelsPerHour;
+                const hour = Math.floor(clickedHour);
+
+                // round to nearest 15 minutes
+                let minutes =
+                  Math.round(Math.round((clickedHour - hour) * 60) / 15) * 15;
+                if (minutes === 60) {
+                  minutes = 45;
+                }
+                const formattedStartTime = `${hour
+                  .toString()
+                  .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+                setInitialStartTime(formattedStartTime);
+                setSelectedDay(day);
+                e.preventDefault();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setShowCalendarEventPreview(false);
+                handleTodoDrop(e, day);
+              }}
             >
               {hours.map((hour) => (
                 <div
@@ -363,7 +488,8 @@ export default function CalendarWeek({
               ))}
 
               {/* add current time line marker */}
-              {format(day, "yyyy-MM-dd") == format(new Date(), "yyyy-MM-dd") && (
+              {format(day, "yyyy-MM-dd") ==
+                format(new Date(), "yyyy-MM-dd") && (
                 <div
                   className="current-time-line"
                   style={{
@@ -392,8 +518,9 @@ export default function CalendarWeek({
                 })
                 .filter(
                   (event) =>
+                    event.start_date &&
                     format(event.start_date, "yyyy-MM-dd") ===
-                    format(day, "yyyy-MM-dd") 
+                      format(day, "yyyy-MM-dd")
                 )
                 .map((event, index) => {
                   const startHour =
@@ -417,12 +544,32 @@ export default function CalendarWeek({
                           return;
                         }
                         setSelectedToDo(event);
-                        const x = e.clientX;
+
+                        const popupPadding = 10;
+
                         const y = e.clientY;
-                        setPopupPosition({ x, y });
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        let popup_left = rect.x + rect.width - popupPadding;
+                        const windowWidth = window.innerWidth;
+
+                        if (popup_left + 200 > windowWidth) {
+                          popup_left = rect.x - 200 + popupPadding; 
+                        }
+
+                        setPopupPosition({ x: popup_left, y });
                         setShowEditTodoPopup(true);
                         setSelectedDay(day);
                         setPopupShowing(true);
+                      }}
+                      draggable={true}
+                      onDragStart={(e) => {
+                        setSelectedToDo(event);
+
+                        // hides default drag image
+                        e.dataTransfer.setDragImage(noImage, 0, 0);
+                      }}
+                      onDragEnd={(e) => {
+                        e.preventDefault();
                       }}
                     >
                       <h1 className="calendar-event-title"> {event.title} </h1>
@@ -433,19 +580,23 @@ export default function CalendarWeek({
                     </div>
                   );
                 })}
-              
+
               {/* add any preview */}
-              {showTodoPopup && (format(day, "yyyy-MM-dd") == format(selectedDay, "yyyy-MM-dd")) && (
+              {(showTodoPopup || showCalendarEventPreview) &&
+                format(day, "yyyy-MM-dd") ==
+                  format(selectedDay, "yyyy-MM-dd") && (
                   <div
                     className="calendar-event-preview"
                     style={{
-                      top: `${(parseInt(initialStartTime.split(":")[0]) + (parseInt(initialStartTime.split(":")[1]) / 60)) * pixelsPerHour}px`,
-                      height: `${(initialDuration) * pixelsPerHour}px`,
+                      top: `${
+                        (parseInt(initialStartTime.split(":")[0]) +
+                          parseInt(initialStartTime.split(":")[1]) / 60) *
+                        pixelsPerHour
+                      }px`,
+                      height: `${initialDuration * pixelsPerHour}px`,
                     }}
-                  >
-                  </div>
-              )}
-
+                  ></div>
+                )}
             </button>
           ))}
         </div>
