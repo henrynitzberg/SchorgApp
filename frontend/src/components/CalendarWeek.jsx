@@ -309,7 +309,7 @@ export default function CalendarWeek({
           }}
         >
           <div className="arrow-left">
-            <img src="/last-month.svg" />
+            <img src="/last-month.svg" draggable="false"/>
           </div>
         </button>
         <div className="calendar-week-headers-wrapper">
@@ -382,7 +382,7 @@ export default function CalendarWeek({
         >
           <div className="arrow-right">
             {/* right arrow image */}
-            <img src="/next-month.svg" alt="right arrow" />
+            <img src="/next-month.svg" draggable="false" />
           </div>
         </button>
       </div>

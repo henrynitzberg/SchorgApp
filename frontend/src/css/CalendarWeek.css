@@ -178,6 +178,11 @@
     -ms-user-select: none; /* IE 10 and IE 11 */
 }
 
+.calendar-event:hover {
+    background-color: var(--blue-hover);
+    transition: background-color 0.2s ease;
+}
+
 .calendar-event-title {
     font-size: 13px;
     font-weight: 500;
@@ -185,6 +190,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+
 }
 
 .calendar-event-time {
@@ -231,7 +237,7 @@
 .switch-week-button-left {
     width: 2.5em;
     height: 100%;
-    background-color: var(--red);
+    background-color: var(--back4);
 
     align-items: center;
 
@@ -247,7 +253,7 @@
 .switch-week-button-right {
     width: 2.5em;
     height: 100%;
-    background-color: var(--red);
+    background-color: var(--back4);
 
     align-items: center;
 
