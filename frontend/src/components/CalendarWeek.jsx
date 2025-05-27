@@ -211,6 +211,25 @@ export default function CalendarWeek({
     );
   };
 
+  const generatePopupPosition = (e, popup_width, popup_height) => {
+    const popupPadding = 10;
+
+    let y = e.clientY;
+    const rect = e.currentTarget.getBoundingClientRect();
+    let popup_left = rect.x + rect.width - popupPadding;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    if (popup_left + popup_width > windowWidth) {
+      popup_left = rect.x - popup_width + popupPadding;
+    }
+    if (y + popup_height > windowHeight + popupPadding) {
+      y = windowHeight - popup_height - popupPadding;
+    }
+
+    return { x: popup_left, y: y };
+  };
+
   const [weekStart, setWeekStart] = useState(
     startOfWeek(startDate, { weekStartsOn: 7 })
   ); // Sunday
@@ -310,18 +329,8 @@ export default function CalendarWeek({
                     return;
                   }
 
-                  const popupPadding = 10;
-
-                  const y = e.clientY;
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  let popup_left = rect.x + rect.width - popupPadding;
-                  const windowWidth = window.innerWidth;
-
-                  if (popup_left + 225 > windowWidth) {
-                    popup_left = rect.x - 225 + popupPadding;
-                  }
-
-                  setPopupPosition({ x: popup_left, y: y });
+                  const position = generatePopupPosition(e, 225, 200);
+                  setPopupPosition(position);
                   setSelectedDay(day);
                   setShowDeliverablePopup(true);
                   setPopupShowing(true);
@@ -402,22 +411,14 @@ export default function CalendarWeek({
                 }
 
                 // TODO: in all places where popup location is set, the width
-                // of the popup (200, here) is hardcoded. Don't do this.
-                const popupPadding = 10;
+                // of the popup (200, here) is hardcoded. Don't do this. Also...
+                // the 300 for height is totally arbitrary.
+                const position = generatePopupPosition(e, 200, 300);
+                setPopupPosition(position);
+                setSelectedDay(day);
 
                 const y = e.clientY;
                 const rect = e.currentTarget.getBoundingClientRect();
-                let popup_left = rect.x + rect.width - popupPadding;
-                const windowWidth = window.innerWidth;
-
-                if (popup_left + 200 > windowWidth) {
-                  popup_left = rect.x - 200 + popupPadding;
-                }
-
-                setPopupPosition({ x: popup_left, y: y });
-
-                setSelectedDay(day);
-
                 const clickedHour = (y - rect.top) / pixelsPerHour;
                 const hour = Math.floor(clickedHour);
                 // round to nearest 15 minutes
@@ -537,18 +538,8 @@ export default function CalendarWeek({
                         }
                         setSelectedToDo(event);
 
-                        const popupPadding = 10;
-
-                        const y = e.clientY;
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        let popup_left = rect.x + rect.width - popupPadding;
-                        const windowWidth = window.innerWidth;
-
-                        if (popup_left + 200 > windowWidth) {
-                          popup_left = rect.x - 200 + popupPadding;
-                        }
-
-                        setPopupPosition({ x: popup_left, y });
+                        const position = generatePopupPosition(e, 200, 300);
+                        setPopupPosition(position);
                         setShowEditTodoPopup(true);
                         setSelectedDay(day);
                         setPopupShowing(true);
