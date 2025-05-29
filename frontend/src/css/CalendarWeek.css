@@ -208,6 +208,7 @@
     right: 0;
     height: 2px;
     background-color: var(--red);
+    z-index: 50;
 }
 
 .popup-background {
@@ -239,6 +240,8 @@
     height: 100%;
     background-color: var(--back4);
 
+    user-select: none;
+
     align-items: center;
 
     border-top-left-radius: 1em;
@@ -254,6 +257,8 @@
     width: 2.5em;
     height: 100%;
     background-color: var(--back4);
+
+    user-select: none;
 
     align-items: center;
 

@@ -230,6 +230,106 @@ export default function CalendarWeek({
     return { x: popup_left, y: y };
   };
 
+  const [groupedTodos, setGroupedTodos] = useState([]);
+
+  const todosIntersect = (todo1, todo2) => {
+    const start1 = new Date(todo1.times.start);
+    const end1 = new Date(todo1.times.end);
+    const start2 = new Date(todo2.times.start);
+    const end2 = new Date(todo2.times.end);
+    return (
+      (start1 < start2 && start2 < end1) || (start2 < start1 && start1 < end2)
+    );
+  };
+
+  const noneIntersect = (group, todo) => {
+    for (let i = 0; i < group.length; i++) {
+      if (todosIntersect(group[i], todo)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // sort group of intersecting todos for optimal layout
+  const sortGroupForOptimalLayout = (group) => {
+    let layers = [[group[0]]];
+    for (let i = 1; i < group.length; i++) {
+      for (let j = 0; j < layers.length; j++) {
+        if (noneIntersect(layers[j], group[i])) {
+          layers[j].push(group[i]);
+          break;
+        } else if (j === layers.length - 1) {
+          layers.push([group[i]]);
+          break;
+        }
+      }
+    }
+    // TODO: decide how to sort
+    layers.sort((a, b) => {
+      return new Date(a[0].times.start) - new Date(b[0].times.start);
+    });
+
+    return layers;
+  };
+
+  const groupOverlappingTodos = (todos) => {
+    const sortedByStart = todos
+      .filter((todo) => {
+        // filter out todos that shouldn't be displayed
+        return todo.times && todo.times.start && todo.times.end;
+      })
+      .sort((a, b) => {
+        return new Date(a.times.start) - new Date(b.times.start);
+      });
+
+    const groupedTodos = [];
+    let currentGroup = [];
+    let currentLatestEnd = null;
+
+    for (let i = 0; i < sortedByStart.length; i++) {
+      const currentTodo = sortedByStart[i];
+      const currentStart = new Date(currentTodo.times.start);
+      const currentEnd = new Date(currentTodo.times.end);
+
+      if (currentGroup.length === 0) {
+        // if group is empty, start new group
+        currentGroup.push(currentTodo);
+        currentLatestEnd = currentEnd;
+      } else {
+        // check if any todo in current group overlaps with current todo
+        if (currentStart < currentLatestEnd) {
+          currentGroup.push(currentTodo);
+          if (currentEnd > currentLatestEnd) {
+            currentLatestEnd = currentEnd;
+          }
+        } else {
+          // if no overlap, push current group and start new group
+          groupedTodos.push(currentGroup);
+          currentGroup = [currentTodo];
+          currentLatestEnd = currentEnd;
+        }
+      }
+    }
+    // push the last group if it exists
+    if (currentGroup.length > 0) {
+      groupedTodos.push(currentGroup);
+    }
+
+    // within groupedTodos, sort each for optimal layout
+    const groupedForLayout = groupedTodos.map((group) => {
+      const sortedGroup = sortGroupForOptimalLayout(group);
+      return sortedGroup;
+    });
+    console.log("Grouped Todos: ", groupedForLayout);
+    return groupedForLayout;
+  };
+
+  useEffect(() => {
+    const grouped = groupOverlappingTodos(userTodos);
+    setGroupedTodos(grouped);
+  }, [userTodos]);
+
   const [weekStart, setWeekStart] = useState(
     startOfWeek(startDate, { weekStartsOn: 7 })
   ); // Sunday
@@ -309,7 +409,7 @@ export default function CalendarWeek({
           }}
         >
           <div className="arrow-left">
-            <img src="/last-month.svg" draggable="false"/>
+            <img src="/last-month.svg" draggable="false" />
           </div>
         </button>
         <div className="calendar-week-headers-wrapper">
@@ -495,74 +595,74 @@ export default function CalendarWeek({
               )}
 
               {/* add events */}
-              {userTodos
-                .filter((todo) => {
-                  const matchingDeliverable = userDeliverables.find(
-                    (deliverable) => deliverable._id === todo.deliverable
-                  );
-
-                  if (!matchingDeliverable) return true;
-
-                  const matchingSpace = userSpaces.find(
-                    (space) => space._id === matchingDeliverable.space
-                  );
-
-                  return matchingSpace ? matchingSpace.shown !== false : true;
-                })
-                .filter(
-                  (event) =>
-                    event.times.start &&
-                    format(event.times.start, "yyyy-MM-dd") ===
-                      format(day, "yyyy-MM-dd")
-                )
-                .map((event, index) => {
-                  const startHour =
-                    new Date(event.times.start).getHours() +
-                    new Date(event.times.start).getMinutes() / 60;
-                  const endHour =
-                    new Date(event.times.end).getHours() +
-                    new Date(event.times.end).getMinutes() / 60;
-                  const top = startHour * pixelsPerHour;
-                  const height = (endHour - startHour) * pixelsPerHour;
+              {groupedTodos
+                .filter((todoDisplayGroup) => {
                   return (
-                    <div
-                      key={index}
-                      className="calendar-event"
-                      style={{
-                        top: `${top}px`,
-                        height: `${height}px`,
-                      }}
-                      onContextMenu={(e) => {
-                        if (showEditTodoPopup) {
-                          return;
-                        }
-                        setSelectedToDo(event);
-
-                        const position = generatePopupPosition(e, 200, 300);
-                        setPopupPosition(position);
-                        setShowEditTodoPopup(true);
-                        setSelectedDay(day);
-                        setPopupShowing(true);
-                      }}
-                      draggable={true}
-                      onDragStart={(e) => {
-                        setSelectedToDo(event);
-
-                        // hides default drag image
-                        e.dataTransfer.setDragImage(noImage, 0, 0);
-                      }}
-                      onDragEnd={(e) => {
-                        setShowCalendarEventPreview(false);
-                        e.preventDefault();
-                      }}
-                    >
-                      <h1 className="calendar-event-title"> {event.title} </h1>
-                      <h1 className="calendar-event-time">
-                        {format(event.times.start, "HH:mm")}-
-                        {format(event.times.end, "HH:mm")}
-                      </h1>
-                    </div>
+                    format(todoDisplayGroup[0][0].times.start, "yyyy-MM-dd") ===
+                    format(day, "yyyy-MM-dd")
                   );
+                })
+                .map((todoDisplayGroup) => {
+                  return todoDisplayGroup.map((eventGroup, groupIndex) => {
+                    return eventGroup.map((event, index) => {
+                      const currGroupSize = todoDisplayGroup.length;
+
+                      const startHour =
+                        new Date(event.times.start).getHours() +
+                        new Date(event.times.start).getMinutes() / 60;
+                      const endHour =
+                        new Date(event.times.end).getHours() +
+                        new Date(event.times.end).getMinutes() / 60;
+                      const top = startHour * pixelsPerHour;
+                      const height = (endHour - startHour) * pixelsPerHour;
+                      const width = 100 / currGroupSize; // percentage width based on group size
+                      const left = (100 / currGroupSize) * groupIndex; // left offset based on index in group
+                      return (
+                        <div
+                          key={index}
+                          className="calendar-event"
+                          style={{
+                            top: `${top}px`,
+                            height: `${height}px`,
+                            width: `${width}%`,
+                            left: `${left}%`,
+                          }}
+                          onContextMenu={(e) => {
+                            if (showEditTodoPopup) {
+                              return;
+                            }
+                            setSelectedToDo(event);
+
+                            const position = generatePopupPosition(e, 200, 300);
+                            setPopupPosition(position);
+                            setShowEditTodoPopup(true);
+                            setSelectedDay(day);
+                            setPopupShowing(true);
+                          }}
+                          draggable={true}
+                          onDragStart={(e) => {
+                            setSelectedToDo(event);
+
+                            // hides default drag image
+                            e.dataTransfer.setDragImage(noImage, 0, 0);
+                          }}
+                          onDragEnd={(e) => {
+                            setShowCalendarEventPreview(false);
+                            e.preventDefault();
+                          }}
+                        >
+                          <h1 className="calendar-event-title">
+                            {" "}
+                            {event.title}{" "}
+                          </h1>
+                          <h1 className="calendar-event-time">
+                            {format(event.times.start, "HH:mm")}-
+                            {format(event.times.end, "HH:mm")}
+                          </h1>
+                        </div>
+                      );
+                    });
+                  });
                 })}
 
               {/* add event preview */}
